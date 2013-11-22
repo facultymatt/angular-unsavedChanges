@@ -9,7 +9,7 @@
 ## API 
 Provides three directives for use. 
 
-`unsaved-warning-group` Wrap your form and disregard elements. Required! 
+`unsaved-warning-group` Wrap your form and formClear elements. Required! 
 
 `unsaved-warning-form` Add to forms you want to register with directive. 
 
@@ -17,7 +17,7 @@ Provides three directives for use.
 
 ## Gotchas / Known Bugs
 
-*** Note you must wrap your forms and disregard buttons with `unsaved-warning-group` even if you are only using 1 form. 
+*** Note you must wrap your forms and formClear buttons with `unsaved-warning-group` even if you are only using 1 form. 
 
 *** Known issue: sometimes the form is removed from expected scope. Ie: in your controller `$scope.formName` no longer works. You might need to access `$scope.$$childTail.formName`.
 
