@@ -1,5 +1,7 @@
 # mm.unsavedChanges
 
+## See [https://github.com/facultymatt/angular-unsavedChanges/tree/develop](https://github.com/facultymatt/angular-unsavedChanges/tree/develop) for a much improved version.
+
 ### An AngularJS directive for forms that alerts user of unsaved changes.
 
 This directive will alert users when they navigate away and the form has unsaved changes. It will be triggered in all situations where form data would be lost.
