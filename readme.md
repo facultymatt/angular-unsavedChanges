@@ -1,49 +1,26 @@
-# mm.unsavedChanges
+# Development Version!
 
-### An AngularJS directive for forms that alerts user of unsaved changes.
+## Supports these cool new features: 
 
-This directive will alert users when they navigate away and the form has unsaved changes. It will be triggered in all situations where form data would be lost.
+- Warning when user has unsaved changes and attempts to navigate away or reload the page.
+- Disregarding changes by clicking a button
+- Multiple forms on single page (prior versions has issues with this)
 
-- user clicks a link, 
-- user navigates with forward / back button
-- user swipes (iOS), 
-- user refreshes the page
+## API 
+Provides three directives for use. 
 
-**How it Works**
+`unsaved-warning-group` Wrap your form and disregard elements. Required! 
 
-The directive binds to `locationChangeStart` which catches all navigation. For page reaload, the directive binds to `window.onbeforeunload`. In both instances, the directive automatically un-binds if the user confirms disregard the changes. 
+`unsaved-warning-form` Add to forms you want to register with directive. 
 
-The directive uses `ngForm.$dirty` to watch for changes to the form. 
+`unsaved-warning-clear` Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. 
 
-**How to Use**
+## Gotchas / Known Bugs
 
-1. Include the JS, for example `<script src="directives/mm.unsavedChanges.js"></script>`. Note you can also just copy the script into your project.
-2. Include in your app, for example: `angular.module('app', ['mm.unsavedChanges', 'anotherDirective'])`
-3. Add attribute to your form, `unsaved-changes-warning`
-4. That's it! 
+*** Note you must wrap your forms and disregard buttons with `unsaved-warning-group` even if you are only using 1 form. 
 
-**Handcrafted In Philadelphia**
+*** Known issue: sometimes the form is removed from expected scope. Ie: in your controller `$scope.formName` no longer works. You might need to access `$scope.$$childTail.formName`.
 
-**License**
+## Demo / Dev
 
-The MIT License
-
-Copyright (c) 2013 Matt Miller, Faculty Creative, www.facultycreative.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+To try the demo run `npm install` && `bower install` && `grunt connect`. Then navigate to [http://127.0.0.1:9001/demo](http://127.0.0.1:9001/demo).
