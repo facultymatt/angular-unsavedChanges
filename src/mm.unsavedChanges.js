@@ -82,7 +82,7 @@ angular.module('mm.unsavedChanges', [])
         } else {
             return message;
         }
-    };
+    }
 
     // Checks all forms, if any one is dirty will return true
     function allFormsClean() {

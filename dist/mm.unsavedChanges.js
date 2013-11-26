@@ -4,6 +4,8 @@ angular.module('mm.unsavedChanges', [])
     
     var logEnabled = false;
 
+    var useTranslateService = true;
+
     var routeEvent = '$locationChangeStart';
 
     var navigateMessage = 'You will lose unsaved changes if you leave this page';
@@ -25,6 +27,10 @@ angular.module('mm.unsavedChanges', [])
     this.setReloadMessage = function(newReloadMessage){
         reloadMessage = newReloadMessage;
     };
+
+    this.setUseTranslateService = function(configUseTranslateService){
+        useTranslateService = configUseTranslateService;
+    };
     
     this.$get = function() {
         return {
@@ -34,10 +40,10 @@ angular.module('mm.unsavedChanges', [])
             logIfEnabled: function(){
                 if(logEnabled){
                     if(arguments.length === 2){
-                        console.log(arguments[0],arguments[1]);    
+                        0;    
                     }
                     if(arguments.length === 1){
-                        console.log(arguments[0]);    
+                        0;    
                     }
                 }
             },
@@ -49,6 +55,9 @@ angular.module('mm.unsavedChanges', [])
             },
             getReloadMessage: function(){
                 return reloadMessage;
+            },
+            getUseTranslateService: function(){
+                return useTranslateService;
             }
         };
     };
@@ -68,12 +77,12 @@ angular.module('mm.unsavedChanges', [])
     };
 
     function translateIfAble(message){
-        if($injector.has('$translate')){
+        if($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()){
             return $injector.get('$translate')(message);
         } else {
             return message;
         }
-    };
+    }
 
     // Checks all forms, if any one is dirty will return true
     function allFormsClean() {
@@ -175,7 +184,6 @@ angular.module('mm.unsavedChanges', [])
                 unsavedWarningSharedService.removePrompt();
             });
 
-            // Lets clean up after ourselves should the element be destroyed
             scope.$on('$destroy',function(){
                 unsavedWarningSharedService.removeForm(formCtrl);
             });
