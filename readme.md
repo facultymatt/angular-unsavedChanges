@@ -24,3 +24,8 @@ Provides three directives for use.
 ## Demo / Dev
 
 To try the demo run `npm install` && `bower install` && `grunt connect`. Then navigate to [http://127.0.0.1:9001/demo](http://127.0.0.1:9001/demo).
+
+
+## Test
+
+Run unit tests with `grunt autotest`. For more test commands see the grunt file. 
