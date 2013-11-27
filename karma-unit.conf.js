@@ -14,6 +14,7 @@ module.exports = function(config) {
       // DEPENDENCIES  
       // ------------------------------
       'demo/bower_components/angular/angular.js',
+      'demo/bower_components/angular-mocks/angular-mocks.js',
       'demo/bower_components/angular-route/angular-route.js',
       'src/mm.unsavedChanges.js',
       'spec/**/*.spec.js'
