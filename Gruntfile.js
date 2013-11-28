@@ -21,7 +21,6 @@ module.exports = function(grunt) {
                 singleRun: false
             }
         },
-
         'min': {
             'dist': {
                 'src': ['dist/mm.unsavedChanges.js'],

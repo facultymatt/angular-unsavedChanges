@@ -16,6 +16,8 @@ module.exports = function(config) {
       'demo/bower_components/angular/angular.js',
       'demo/bower_components/angular-mocks/angular-mocks.js',
       'demo/bower_components/angular-route/angular-route.js',
+      //'demo/bower_components/angular-scenario/angular-scenario.js',
+      //'node_modules/karma-ng-scenario/lib/adapter.js',
       'src/mm.unsavedChanges.js',
       'spec/**/*.spec.js'
     ],
@@ -55,7 +57,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
 
     // Continuous Integration mode
     // if true, it capture browsers, run tests and exit

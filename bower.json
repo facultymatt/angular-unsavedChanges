@@ -22,6 +22,8 @@
   "dependencies": {
     "angular": "~1.2.2",
     "angular-route": "~1.2.2",
-    "angular-mocks": "~1.2.2"
+    "angular-mocks": "~1.2.2",
+    "angular-scenario": "~1.2.2",
+    "jquery": "~2.0.3"
   }
 }
