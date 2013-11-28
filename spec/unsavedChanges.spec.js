@@ -7,7 +7,10 @@ describe('UnsavedChanges', function() {
         clearTemplate,
         scope,
         formInput,
+        theForm,
+        theButton,
         unsavedDevProviderCache,
+        defaultMessageReload,
         $routeProviderCache,
         $rootScope,
         $sniffer,
@@ -26,53 +29,79 @@ describe('UnsavedChanges', function() {
     // }));
 
     beforeEach(module(function($compileProvider, $routeProvider) {
-        $compileProvider.directive('storeModelCtrl', function() {
-            return {
-                require: 'ngModel',
-                link: function(scope, elm, attr, ctrl) {
-                    control = ctrl;
-                }
-            };
-        });
-
+        
+        // cache the provider for access in tests
         $routeProviderCache = $routeProvider;
 
+        // setup test routes
         $routeProviderCache
-                .when('/page1', {
-                    //templateUrl: 'page1.html'
-                })
-                .when('/page2', {
-                    //templateUrl: 'page2.html'
-                })
-                .otherwise({
-                    redirectTo: '/page1'
-                })
+            .when('/page1', {})
+            .when('/page2', {})
+            .otherwise({
+                redirectTo: '/page1'
+            })
 
+        // setup message defaults
+        defaultMessageReload = "You will lose unsaved changes if you reload this page";
 
     }));
 
     // modules
     beforeEach(inject(function(_$rootScope_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_) {
-        $rootScope = _$rootScope_;
+        
+        // grab our injected variables
         $sniffer = _$sniffer_;
         $compile = _$compile_;
         $location = _$location_;
         $window = _$window_;
         $route = _$route_;
+        $rootScope = _$rootScope_;
         scope = $rootScope.$new();
 
+        // helper to simulate value change on form input
+        // accepts angular element input
         changeInputValue = function(elm, value) {
             elm.$setViewValue(value);
-        }; 
+        };
 
         // build fake nav to simulate page navigation
         // @note we could do this by broadcasting $locationChangeStart
         // but this will simulate our terminated navigation too
-        pageNav = angular.element('<a id="page1" href="page1">Page1</a>' + 
-                                  '<a id="page2" href="page2">Page2</a>');
+        //
+        // @note our page nav will be present across all pages
+        // and tests, so we setup here. Our forms in contrast we setup 
+        // in test beforeEach tests. 
+        pageNav = angular.element('<a id="page1" href="page1">Page1</a>' +
+            '<a id="page2" href="page2">Page2</a>');
 
-        $compile(formTemplate)($rootScope);
+        $compile(pageNav)(scope);
 
+
+        // spies!
+        // these spies ensure we listen to on before unload and such
+        // since we can't spy on these directly
+        spyOn($window, 'addEventListener');
+        spyOn($window, 'removeEventListener');
+
+
+        // start all tests from first page
+        $location.url('/page1');
+
+        formTemplate = angular.element('<div unsaved-warning-group>' +
+                       '<form name="testForm" unsaved-warning-form>' +
+                       '<input name="test" type="text" ng-model="test"/>' +
+                       '</form>' +
+                       '<a unsaved-warning-clear></a>' +
+                       '</div>');
+
+        $compile(formTemplate)(scope);  
+
+        // selector for the form, since it's within the group
+        theForm = scope.$$childTail.testForm.test; 
+        theButton = formTemplate.find('a');
+
+         // change input value
+        //changeInputValue(theForm, 'val1');
 
     }));
 
@@ -80,82 +109,45 @@ describe('UnsavedChanges', function() {
 
     describe('Messaging on unsaved changes', function() {
 
-        beforeEach(inject(function() {
-
-            spyOn($window, 'addEventListener');
-            spyOn($window, 'removeEventListener');
-
-            $location.url('/page1');
-
-            scope.test = '';
-
-            var template = '<div unsaved-warning-group>' +
-                           '<form name="testForm" unsaved-warning-form>' +
-                           '<input name="test" type="text" ng-model="test"/>' +
-                           '</form>' +
-                           '<a unsaved-warning-clear></a>' +
-                           '</div>';
-
-            formTemplate = angular.element(template);
-            $compile(formTemplate)(scope);   
-            
-
-        }))
-
-        it('acts on forms with attr `unsaved-warning-form`', function() {});
+        // it('acts on forms with attr `unsaved-warning-form`', function() {
+        //     console.log(formTemplate);
+        // });
 
         it('detects when a form is dirty', function() {});
 
         it('messages when navigating away from current url', function() {});
 
-        it('messages when reloading page', function() {});
+        it('messages when reloading page', function() {
 
-        iit('messages when going back', function() {
-            
-            
-
-            var theForm = scope.$$childTail.testForm.test;
-            changeInputValue(theForm, 'val1');
-
+            // reload the page
             $route.reload();
-
             scope.$digest();
 
-            console.log('Most recent call args:', $window.addEventListener.mostRecentCall.args);
+            // if directive works properly, most recently function added
+            // with `addEventListener` method, will be the onbeforeunload method
+            // which we can verify by checking the returned message
             var msg = $window.addEventListener.mostRecentCall.args[1]({});
 
-            expect(msg).toEqual("You will lose unsaved changes if you reload this page");
+            // expect message
+            expect(msg).toEqual(defaultMessageReload);
 
-            var button = formTemplate.find('a');
-            
+            // simulate click on unsaved clear button
+            theButton[0].click();
 
-            console.log(button);
-
-            button[0].click(); 
-
+            // simulate page reload
+            // this should throw warning if user 
+            // has not yet cleared message
             $route.reload();
             scope.$digest();
 
             var msg = $window.removeEventListener.mostRecentCall.args[1]({});
-            expect(msg).toEqual("You will lose unsaved changes if you reload this page");
+            expect(msg).toEqual(defaultMessageReload);
+            
+        });
 
-
-            // spyOn($window, 'confirm');
-
-            // // // @note this will not need childTail when we remove 
-            // // // the group directive
-            // 
-
-            // console.log(theForm.className)
-
-            // changeInputValue(theForm, 'val1');
-
-            // // //ensure our input it set
-            // //expect(formTemplate.find('form')[0].className).toContain('ng-dirty');
-
-            // //$route.reload();
-
-            // expect($window.confirm).toHaveBeenCalled();
+        it('messages when going back', function() {
+            
+            
 
         });
 
@@ -165,13 +157,80 @@ describe('UnsavedChanges', function() {
 
     describe('Disregarding unsaved changes', function() {
 
-        it('acts on element with attr `unsaved-changes-clear`', function() {});
+        it('directive acts on element with attr `unsaved-changes-clear`', function() {});
 
-        it('prevents message on page navigate', function() {});
+        it('clicking element prevents message on page navigate', function() {});
 
-        it('prevents message on page reload', function() {});
+        it('clicking element prevents message on page reload', function() {
 
-        it('preventing changes is temporary, and message will appear on next dirty form', function() {});
+            // reload the page
+            $route.reload();
+            scope.$digest();
+
+            // if directive works properly, most recently function added
+            // with `addEventListener` method, will be the onbeforeunload method
+            // which we can verify by checking the returned message
+            var msg = $window.addEventListener.mostRecentCall.args[1]({});
+
+            // expect message
+            expect(msg).toEqual(defaultMessageReload);
+
+            // -------
+
+            // simulate click on unsaved clear button
+            theButton[0].click();
+
+            // simulate page reload
+            // this should throw warning if user 
+            // has not yet cleared message
+            $route.reload();
+            scope.$digest();
+
+            var msg = $window.removeEventListener.mostRecentCall.args[1]({});
+            expect(msg).toEqual(defaultMessageReload);
+
+        });
+
+        iit('preventing changes is temporary, and message will appear on next dirty form', function() {
+
+            
+
+            changeInputValue(theForm, 'val1');
+
+            // if directive works properly, most recently function added
+            // with `addEventListener` method, will be the onbeforeunload method
+            // which we can verify by checking the returned message
+            var msg = $window.addEventListener.mostRecentCall.args[1]({});
+
+            // expect message
+            expect(msg).toEqual(defaultMessageReload);
+
+            // -------
+
+            // simulate click on unsaved clear button
+            theButton[0].click();
+
+            // simulate page reload
+            // this should throw warning if user 
+            // has not yet cleared message
+            $location.url('/page2');
+            scope.$digest();
+            $location.url('/page1');
+            scope.$digest();
+
+
+            console.log(theForm);
+
+            // change input value
+            changeInputValue(theForm, 'val12');
+
+
+            console.log(theForm);
+
+            var msg = $window.removeEventListener.mostRecentCall.args[1]({});
+            expect(msg).toEqual(defaultMessageReload);
+
+        });
 
     });
 
