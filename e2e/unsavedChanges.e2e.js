@@ -157,4 +157,98 @@ describe('When form is dirty', function() {
 
     });
 
+    describe('user dismisses multiple times', function() {
+
+        afterEach(function() {
+            browser.navigate().refresh();
+            alertDialog = browser.switchTo().alert();
+            alertDialog.accept();
+        });
+
+        describe('user clicks link, dismisses, then clicks link again', function() {
+
+            beforeEach(function() {
+                element(by.id('page2')).click();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+                element(by.id('page2')).click();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+            });
+
+            it('should not navigate', function() {
+                expect(browser.getCurrentUrl()).toContain('/page1');
+            });
+
+            it('should keep form values', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+            });
+
+        });
+
+        describe('user clicks link, dismisses, then refreshes page', function() {
+
+            beforeEach(function() {
+                element(by.id('page2')).click();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+                browser.navigate().refresh();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+            });
+
+            it('should not refresh', function() {
+                expect(browser.getCurrentUrl()).toContain('/page1');
+            });
+
+            it('should keep form values', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+            });
+
+        });
+
+        describe('user refreshes, dismisses, then clicks link', function() {
+
+            beforeEach(function() {
+                browser.navigate().refresh();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+                element(by.id('page2')).click();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+            });
+
+            it('should not refresh', function() {
+                expect(browser.getCurrentUrl()).toContain('/page1');
+            });
+
+            it('should keep form values', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+            });
+
+        });
+
+        describe('user refreshes, dismisses, then refreshes', function() {
+
+            beforeEach(function() {
+                browser.navigate().refresh();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+                browser.navigate().refresh();
+                alertDialog = browser.switchTo().alert();
+                alertDialog.dismiss();
+            });
+
+            it('should not refresh', function() {
+                expect(browser.getCurrentUrl()).toContain('/page1');
+            });
+
+            it('should keep form values', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+            });
+
+        });
+
+    });
+
 });
