@@ -45,11 +45,30 @@ exports.config = {
   // https://code.google.com/p/selenium/wiki/DesiredCapabilities
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
-  capabilities: {
-    'browserName': 'chrome',
-    //'version': '7',
-    //'platform': 'XP'
-  },
+  // capabilities: {
+  //   'browserName': 'chrome',
+  //   //'version': '7',
+  //   //'platform': 'XP'
+  // },
+
+  // sauceLabs: {
+  //   testName: 'Angular Unsaved Changes',
+  //   startConnect: false,
+  //   tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+  // },
+
+  // For more browsers on Sauce Labs see:
+  // https://saucelabs.com/docs/platforms/webdriver
+  // customLaunchers: {
+  //   'SL_Chrome': {
+  //     base: 'SauceLabs',
+  //     browserName: 'chrome'
+  //   },
+  //   'SL_Firefox': {
+  //     base: 'SauceLabs',
+  //     browserName: 'firefox'
+  //   },
+  // },
 
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
