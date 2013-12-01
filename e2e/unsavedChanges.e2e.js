@@ -11,7 +11,7 @@ var cleanUp = function() {
     alertDialog.accept();
 };
 
-describe('When form is dirty', function() {
+describe('When single form is dirty', function() {
 
     beforeEach(function() {
         // start on page 2, then navigate to page 1
@@ -277,28 +277,94 @@ describe('When form is dirty', function() {
 
     });
 
-    describe('disregard changes button', function() {
-      
+    describe('user clicks "disregard" changes button', function() {
+
         beforeEach(function() {
             element(by.id('clear')).click();
-        });  
-
-        it('should navigate without message', function() {});
-
-        it('should refresh without message', function() {});
-
-        it('should go back without message', function() {});
-
-        describe('user makes changes on next page', function() {
-            
-            it('should message on navigate', function() {});
-
-            it('should message on refresh', function() {});
-
-            it('should message on back', function() {});
-
         });
 
+        describe('should navigate without message', function() {
+            beforeEach(function() {
+                element(by.id('page2')).click();
+            });
+            it('should navigate', function() {
+                expect(browser.getCurrentUrl()).toContain('/page2');
+            });
+        });
+
+        describe('should refresh without message', function() {
+            beforeEach(function() {
+                browser.navigate().refresh();
+            });
+            it('should refresh', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+            });
+        });
+
+        describe('should go back without message', function() {
+            beforeEach(function() {
+                browser.navigate().back();
+            });
+            it('should go back', function() {
+                expect(browser.getCurrentUrl()).toContain('/page2');
+            });
+        });
+
+    });
+
+    describe('user submits form', function() {
+        beforeEach(function() {
+            element(by.id('submitForm')).click();
+        });
+
+        describe('should navigate without message', function() {
+            beforeEach(function() {
+                element(by.id('page2')).click();
+            });
+            it('should navigate', function() {
+                expect(browser.getCurrentUrl()).toContain('/page2');
+            });
+        });
+
+        describe('should refresh without message', function() {
+            beforeEach(function() {
+                browser.navigate().refresh();
+            });
+            it('should refresh', function() {
+                expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+            });
+        });
+
+        describe('should go back without message', function() {
+            beforeEach(function() {
+                browser.navigate().back();
+            });
+            it('should go back', function() {
+                expect(browser.getCurrentUrl()).toContain('/page2');
+            });
+        });
+    
+    });
+
+});
+
+describe('When multiple forms are dirty', function() {
+
+    beforeEach(function() {
+        // start on page 2, then navigate to page 1
+        // so that our history contains a page to go back to
+        browser.get('demo/#/page1');
+        element(by.id('page2')).click();
+        element(by.model('user1.name')).sendKeys('haha');
+        element(by.model('user2.name')).sendKeys('haha');
+        element(by.model('user3.name')).sendKeys('haha');
+    });
+
+    it('should only show one message (versus three)', function() {
+        element(by.id('page1')).click();
+        alertDialog = browser.switchTo().alert();
+        alertDialog.accept();
+        expect(browser.getCurrentUrl()).toContain('/page1');
     });
 
 });
@@ -341,10 +407,3 @@ describe('When form not dirty', function() {
     });
 
 });
-
-
-
-
-
-
-
