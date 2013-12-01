@@ -4,7 +4,6 @@
   "dependencies": {
     "express": "latest",
     "bower": "~1.2.6",
-    "bower": "~1.2.6",
     "grunt": "~0.4.1",
     "grunt-shell": "~0.4.0",
     "grunt-shell-spawn": "~0.3.0",
@@ -45,16 +44,19 @@
     "karma": "~0.10.2",
     "karma-ng-html2js-preprocessor": "~0.1.0",
     "protractor": "latest",
-    "grunt-pr": "latest",
+    "grunt-protractor-runner": "latest",
     "grunt-contrib-less": "~0.8.1",
     "grunt-jsbeautifier": "~0.2.3",
     "grunt-angular-templates": "~0.4.7",
     "grunt-replace": "~0.5.1",
-    "grunt-spritesmith": "~1.12.0"
+    "grunt-spritesmith": "~1.12.0",
+    "grunt-strip": "~0.2.1",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-yui-compressor": "~0.3.0"
   },
   "engines": {
     "node": "0.10.x",
-    "npm":  "1.2.x"
+    "npm": "1.2.x"
   },
   "scripts": {
     "test": "grunt test"
