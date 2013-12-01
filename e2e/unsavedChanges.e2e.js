@@ -5,6 +5,12 @@
 
 var alertDialog;
 
+var cleanUp = function() {
+    browser.navigate().refresh();
+    alertDialog = browser.switchTo().alert();
+    alertDialog.accept();
+};
+
 describe('When form is dirty', function() {
 
     beforeEach(function() {
@@ -20,7 +26,7 @@ describe('When form is dirty', function() {
         beforeEach(function() {
             element(by.id('page2')).click();
             alertDialog = browser.switchTo().alert();
-        })
+        });
 
         it('should alert user', function() {
             expect(alertDialog.accept).toBeDefined();
@@ -45,18 +51,28 @@ describe('When form is dirty', function() {
 
             it('should stay on page', function() {
                 expect(browser.getCurrentUrl()).toContain('/page1');
+                // This is important to clear the alert dialog
+                // since we are dismissing it, the alert will
+                // still appear when the browser reloads to run the next
+                // test. So, we need to get ahead of this and clear the
+                // alert manually.
+                cleanUp();
             });
 
-            // This is important to clear the alert dialog
-            // since we are dismissing it, the alert will
-            // still appear when the browser reloads to run the next
-            // test. So, we need to get ahead of this and clear the
-            // alert manually.
-            afterEach(function() {
-                browser.navigate().refresh();
-                alertDialog = browser.switchTo().alert();
-                alertDialog.accept();
+            describe('user clicks "disregard" button', function() {
+                beforeEach(function() {
+                    element(by.id('clear')).click();
+                });
+                describe('user clicks link second time', function() {
+                    beforeEach(function() {
+                        element(by.id('page2')).click();
+                    })
+                    it('should navigate to page', function() {
+                        expect(browser.getCurrentUrl()).toContain('/page2');
+                    });
+                });
             });
+
         });
 
     });
@@ -92,18 +108,23 @@ describe('When form is dirty', function() {
 
             it('should stay on page', function() {
                 expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                cleanUp();
             });
 
-            // This is important to clear the alert dialog
-            // since we are dismissing it, the alert will
-            // still appear when the browser reloads to run the next
-            // test. So, we need to get ahead of this and clear the
-            // alert manually.
-            afterEach(function() {
-                browser.navigate().refresh();
-                alertDialog = browser.switchTo().alert();
-                alertDialog.accept();
+            describe('user clicks "disregard" button', function() {
+                beforeEach(function() {
+                    element(by.id('clear')).click();
+                });
+                describe('user refreshes page second time', function() {
+                    beforeEach(function() {
+                        browser.navigate().refresh();
+                    })
+                    it('should navigate to page', function() {
+                        expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+                    });
+                });
             });
+
         });
 
     });
@@ -137,21 +158,26 @@ describe('When form is dirty', function() {
 
             it('should stay on page', function() {
                 expect(browser.getCurrentUrl()).toContain('/page1');
+                cleanUp();
             });
 
             it('should keep form values', function() {
                 expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                cleanUp();
             });
 
-            // This is important to clear the alert dialog
-            // since we are dismissing it, the alert will
-            // still appear when the browser reloads to run the next
-            // test. So, we need to get ahead of this and clear the
-            // alert manually.
-            afterEach(function() {
-                browser.navigate().refresh();
-                alertDialog = browser.switchTo().alert();
-                alertDialog.accept();
+            describe('user clicks "disregard" button', function() {
+                beforeEach(function() {
+                    element(by.id('clear')).click();
+                });
+                describe('user clicks back second time', function() {
+                    beforeEach(function() {
+                        browser.navigate().back();
+                    })
+                    it('should navigate back', function() {
+                        expect(browser.getCurrentUrl()).toContain('/page2');
+                    });
+                });
             });
         });
 
@@ -251,4 +277,74 @@ describe('When form is dirty', function() {
 
     });
 
+    describe('disregard changes button', function() {
+      
+        beforeEach(function() {
+            element(by.id('clear')).click();
+        });  
+
+        it('should navigate without message', function() {});
+
+        it('should refresh without message', function() {});
+
+        it('should go back without message', function() {});
+
+        describe('user makes changes on next page', function() {
+            
+            it('should message on navigate', function() {});
+
+            it('should message on refresh', function() {});
+
+            it('should message on back', function() {});
+
+        });
+
+    });
+
 });
+
+describe('When form not dirty', function() {
+
+    beforeEach(function() {
+        // start on page 2, then navigate to page 1
+        // so that our history contains a page to go back to
+        browser.get('demo/#/page2');
+        element(by.id('page1')).click();
+    });
+
+    describe('when user clicks back', function() {
+        beforeEach(function() {
+            browser.navigate().back();
+        });
+        it('should go back', function() {
+            expect(browser.getCurrentUrl()).toContain('/page2');
+        });
+    });
+
+    describe('when user clicks link', function() {
+        beforeEach(function() {
+            element(by.id('page2')).click();
+        });
+        it('should navigate to link', function() {
+            expect(browser.getCurrentUrl()).toContain('/page2');
+        });
+    });
+
+    describe('when user refresh', function() {
+        beforeEach(function() {
+            element(by.model('outsideForm')).sendKeys('reload');
+            browser.navigate().refresh();
+        });
+        it('should refresh', function() {
+            expect(element(by.model('outsideForm')).getAttribute('value')).toEqual('');
+        });
+    });
+
+});
+
+
+
+
+
+
+
