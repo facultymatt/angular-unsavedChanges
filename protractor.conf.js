@@ -51,24 +51,24 @@ exports.config = {
   //   //'platform': 'XP'
   // },
 
-  // sauceLabs: {
-  //   testName: 'Angular Unsaved Changes',
-  //   startConnect: false,
-  //   tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
-  // },
+  sauceLabs: {
+    testName: 'Angular Unsaved Changes',
+    startConnect: false,
+    tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+  },
 
   // For more browsers on Sauce Labs see:
   // https://saucelabs.com/docs/platforms/webdriver
-  // customLaunchers: {
-  //   'SL_Chrome': {
-  //     base: 'SauceLabs',
-  //     browserName: 'chrome'
-  //   },
-  //   'SL_Firefox': {
-  //     base: 'SauceLabs',
-  //     browserName: 'firefox'
-  //   },
-  // },
+  customLaunchers: {
+    'SL_Chrome': {
+      base: 'SauceLabs',
+      browserName: 'chrome'
+    },
+    'SL_Firefox': {
+      base: 'SauceLabs',
+      browserName: 'firefox'
+    },
+  },
 
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
