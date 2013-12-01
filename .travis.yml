@@ -9,7 +9,7 @@ env:
     - SAUCE_CONNECT_READY_FILE=/tmp/sauce-connect-ready
     - BROWSER_STACK_USERNAME=VojtaJina
     - BROWSER_STACK_ACCESS_KEY=HAfHZaypxAc3PEUrUU9a
-    - LOGS_DIR=/tmp/angular-build/logs
+    - LOGS_DIR=/tmp/logs
 
 before_script:
   - mkdir -p $LOGS_DIR
