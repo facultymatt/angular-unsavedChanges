@@ -4,21 +4,20 @@ node_js:
 
 env:
   global:
-    - SAUCE_USERNAME=facultymatt
-    - SAUCE_ACCESS_KEY=b280b942-1965-446d-90bf-e069b5cd2cf9
-    - SAUCE_CONNECT_READY_FILE=/tmp/sauce-connect-ready
-    - BROWSER_STACK_USERNAME=VojtaJina
-    - BROWSER_STACK_ACCESS_KEY=HAfHZaypxAc3PEUrUU9a
     - LOGS_DIR=/tmp/logs
+
+addons:
+  sauce_connect:
+    username: facultymatt
+    access_key: b280b942-1965-446d-90bf-e069b5cd2cf9
 
 before_script:
   - mkdir -p $LOGS_DIR
   - npm install -g grunt-cli
   - npm install
-  - ./lib/sauce_connect_block.sh
 
 script:
-  - grunt test:e2e
+  - ./travis_test.sh
 
 after_script:
   - ./travis_print_logs.sh
