@@ -33,4 +33,19 @@ To try the demo run `npm install` && `bower install` && `grunt connect`. Then na
 
 ## Test
 
-Run unit tests with `grunt autotest`. For more test commands see the grunt file. 
+__End 2 End Testing__
+Because of the alert / event driven nature of this module it made the most sense to rely on e2e tests. (also its hard to interact with alerts via unit tests).
+
+To run the e2e tests do the following: 
+
+- Install selenium server `$ grunt install`.
+- Start selenium server `$ grunt selenium`. 
+- Run tests `$grunt test:e2e`. Re-run the tests at any time with this command.
+- Stop server when done testing with `$ grunt selenum:stop`.
+
+
+__Unit Tests / In progress__
+Unit tests are not 100% working or passing. I've delayed finishing them until [PR#4](https://github.com/facultymatt/angular-unsavedChanges/pull/4) is merged in. 
+However unit tests can be run with `grunt autotest`. For more test commands see the grunt file. 
+
+
