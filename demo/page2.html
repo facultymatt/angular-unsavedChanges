@@ -5,6 +5,7 @@
         <legend>Form 1</legend>
         <input type="text" name="name" ng-model="user.name">
         <button type="submit">Submit Form</button>
+        <button unsaved-warning-clear>Disregard Form 1 Changes</button>
     </form>
     <p>Is Form 1 Dirty?: {{demoForm1.$dirty}}</p>
     <p ng-show="message">Message: {{message}}</p>
