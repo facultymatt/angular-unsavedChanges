@@ -156,11 +156,12 @@ angular.module('mm.unsavedChanges', [])
 .directive('unsavedWarningClear', function(unsavedWarningSharedService) {
     return {
         scope: true,
+        require: '^form',
         priority: 3000,
-        link: function(scope, element, attrs) {
+        link: function(scope, element, attrs, ctrl) {
             
             element.bind('click', function(event) {
-                unsavedWarningSharedService.removePrompt();
+                ctrl.$setPristine();
             });
         }
     };
@@ -181,7 +182,7 @@ angular.module('mm.unsavedChanges', [])
             // bind to form submit, this makes the typical submit button work
             // in addition to the ability to bind to a seperate button which clears warning
             formElement.bind('submit', function(event) {
-                unsavedWarningSharedService.removePrompt();
+                formCtrl.$setPristine();
             });
 
             scope.$on('$destroy',function(){
