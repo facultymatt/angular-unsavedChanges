@@ -1,7 +1,7 @@
 var myApp = angular.module('unsavedDev', [])
 
-.directive('unsavedWarningGroup', ['$rootScope',
-    function($rootScope) {
+.directive('unsavedWarningGroup', ['$rootScope', '$window',
+    function($rootScope, $window) {
         return {
             scope: true,
             priority: 2000,
@@ -37,8 +37,10 @@ var myApp = angular.module('unsavedDev', [])
                 this.removePrompt = function() {
                     allForms = []; // reset forms array
                     removeFunction();
-                    window.onbeforeunload = null;
+                    $window.removeEventListener('beforeunload', _this.confirmExit);
                 };
+
+                var _this = this;
 
                 // Function called when user tries to close the window
                 this.confirmExit = function() {
@@ -47,27 +49,27 @@ var myApp = angular.module('unsavedDev', [])
                         return messages.reload;
                     } else {
                         removeFunction();
-                        window.onbeforeunload = null;
+                        $window.removeEventListener('beforeunload', _this.confirmExit);
                     }
                 };
 
                 // bind to window close
-                window.onbeforeunload = this.confirmExit;
+                $window.addEventListener('beforeunload', _this.confirmExit);
 
                 // calling this function later will unbind this, acting as $off()
                 removeFunction = $rootScope.$on('$locationChangeStart', function(event, next, current) {
 
                     // @todo this could be written a lot cleaner! 
                     if (!allFormsClean()) {
-                        if (!confirm(messages.navigate)) {
+                        if (!$window.confirm(messages.navigate)) {
                             event.preventDefault(); // user clicks cancel, wants to stay on page 
                         } else {
                             removeFunction(); // unbind our `locationChangeStart` listener
-                            window.onbeforeunload = null; // clear our the `refresh page` listener
+                            $window.removeEventListener('beforeunload', _this.confirmExit);
                         }
                     } else {
                         removeFunction(); // unbind our `locationChangeStart` listener
-                        window.onbeforeunload = null; // clear our the `refresh page` listener
+                        $window.removeEventListener('beforeunload', _this.confirmExit);
                     }
 
                 });
@@ -86,6 +88,7 @@ var myApp = angular.module('unsavedDev', [])
             scope.screenCtrl = screenCtrl;
 
             element.bind('click', function(event) {
+                0;
                 screenCtrl.removePrompt();
             });
 
