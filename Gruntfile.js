@@ -12,6 +12,9 @@ module.exports = function(grunt) {
                 configFile: './protractor.conf.js'
             },
             singlerun: {},
+            travis: {
+                configFile: './protractor_travis.conf.js'
+            },
             auto: {
                 keepAlive: true,
                 options: {
@@ -165,6 +168,11 @@ module.exports = function(grunt) {
     grunt.registerTask('test:e2e', [
         'connect:testserver', // - run concurrent tests
         'protractor:singlerun' // - single run protractor
+    ]);
+
+    grunt.registerTask('test:travis', [
+        'connect:testserver', // - run concurrent tests
+        'protractor:travis' // - single run protractor
     ]);
 
     grunt.registerTask('test:end2end', [

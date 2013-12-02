@@ -2,4 +2,4 @@
 
 set -e
 
-grunt test:e2e
+grunt test:travis
