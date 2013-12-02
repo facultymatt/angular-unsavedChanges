@@ -23,9 +23,10 @@
         <legend>Form 3</legend>
         <input type="text" name="name" ng-model="user.name">
         <button type="submit">Submit Form</button>
+        <button unsaved-warning-clear>Disregard Form 3 Changes</button>
     </form>
     <p>Is Form 3 Dirty?: {{demoForm3.$dirty}}</p>
     <p ng-show="message">Message: {{message}}</p>
 </div>
-<button unsaved-warning-clear>Disregard Changes</button>
+
 </div>
