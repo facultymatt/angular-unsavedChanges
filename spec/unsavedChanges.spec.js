@@ -21,7 +21,7 @@ describe('UnsavedChanges', function() {
         $scope;
 
     beforeEach(module('ngRoute'));
-    beforeEach(module('unsavedDev'));
+    beforeEach(module('mm.unsavedChanges'));
 
     // cache providers
     // beforeEach(module(function(unsavedDevProvider) {
@@ -29,7 +29,7 @@ describe('UnsavedChanges', function() {
     // }));
 
     beforeEach(module(function($compileProvider, $routeProvider) {
-        
+
         // cache the provider for access in tests
         $routeProviderCache = $routeProvider;
 
@@ -48,7 +48,7 @@ describe('UnsavedChanges', function() {
 
     // modules
     beforeEach(inject(function(_$rootScope_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_) {
-        
+
         // grab our injected variables
         $sniffer = _$sniffer_;
         $compile = _$compile_;
@@ -57,12 +57,6 @@ describe('UnsavedChanges', function() {
         $route = _$route_;
         $rootScope = _$rootScope_;
         scope = $rootScope.$new();
-
-        // helper to simulate value change on form input
-        // accepts angular element input
-        changeInputValue = function(elm, value) {
-            elm.$setViewValue(value);
-        };
 
         // build fake nav to simulate page navigation
         // @note we could do this by broadcasting $locationChangeStart
@@ -77,166 +71,122 @@ describe('UnsavedChanges', function() {
         $compile(pageNav)(scope);
 
 
-        // spies!
-        // these spies ensure we listen to on before unload and such
-        // since we can't spy on these directly
-        spyOn($window, 'addEventListener');
-        spyOn($window, 'removeEventListener');
-
-
         // start all tests from first page
         $location.url('/page1');
 
         formTemplate = angular.element('<div unsaved-warning-group>' +
-                       '<form name="testForm" unsaved-warning-form>' +
-                       '<input name="test" type="text" ng-model="test"/>' +
-                       '</form>' +
-                       '<a unsaved-warning-clear></a>' +
-                       '</div>');
+            '<form name="testForm" unsaved-warning-form>' +
+            '<input name="test" type="text" ng-model="test"/>' +
+            '</form>' +
+            '<a unsaved-warning-clear></a>' +
+            '</div>');
 
-        $compile(formTemplate)(scope);  
+        $compile(formTemplate)(scope);
 
         // selector for the form, since it's within the group
-        theForm = scope.$$childTail.testForm.test; 
+        theForm = scope.$$childTail.testForm.test;
         theButton = formTemplate.find('a');
 
-         // change input value
+        // change input value
         //changeInputValue(theForm, 'val1');
 
     }));
 
+    describe('Directives', function() {
 
+        describe('Clear', function() {
 
-    describe('Messaging on unsaved changes', function() {
+            it('registers with attr unsaved-warning-clear', function() {});
 
-        // it('acts on forms with attr `unsaved-warning-form`', function() {
-        //     console.log(formTemplate);
-        // });
-
-        it('detects when a form is dirty', function() {});
-
-        it('messages when navigating away from current url', function() {});
-
-        it('messages when reloading page', function() {
-
-            // reload the page
-            $route.reload();
-            scope.$digest();
-
-            // if directive works properly, most recently function added
-            // with `addEventListener` method, will be the onbeforeunload method
-            // which we can verify by checking the returned message
-            var msg = $window.addEventListener.mostRecentCall.args[1]({});
-
-            // expect message
-            expect(msg).toEqual(defaultMessageReload);
-
-            // simulate click on unsaved clear button
-            theButton[0].click();
-
-            // simulate page reload
-            // this should throw warning if user 
-            // has not yet cleared message
-            $route.reload();
-            scope.$digest();
-
-            var msg = $window.removeEventListener.mostRecentCall.args[1]({});
-            expect(msg).toEqual(defaultMessageReload);
-            
-        });
-
-        it('messages when going back', function() {
-            
-            
+            // it should be registered within a form...
+            // @todo throw warning or document
+            it('sets parent form to setPristine() when clicked', function() {});
 
         });
 
-        it('works when multiple forms are on the same page', function() {});
+        describe('Form', function() {
 
-    });
+            it('registers with attr unsaved-warning-form', function() {});
 
-    describe('Disregarding unsaved changes', function() {
+            describe('when form is dirty', function() {
 
-        it('directive acts on element with attr `unsaved-changes-clear`', function() {});
+                it('will message user when reloading page', function() {});
 
-        it('clicking element prevents message on page navigate', function() {});
+                it('will message user when clicking link away', function() {});
 
-        it('clicking element prevents message on page reload', function() {
+                // @note might be nice to incorporate ngRouter and 
+                // check for this? 
+                //it('will message user when changing state', function() {});
 
-            // reload the page
-            $route.reload();
-            scope.$digest();
+                it('will message user when navigating back', function() {});
 
-            // if directive works properly, most recently function added
-            // with `addEventListener` method, will be the onbeforeunload method
-            // which we can verify by checking the returned message
-            var msg = $window.addEventListener.mostRecentCall.args[1]({});
-
-            // expect message
-            expect(msg).toEqual(defaultMessageReload);
-
-            // -------
-
-            // simulate click on unsaved clear button
-            theButton[0].click();
-
-            // simulate page reload
-            // this should throw warning if user 
-            // has not yet cleared message
-            $route.reload();
-            scope.$digest();
-
-            var msg = $window.removeEventListener.mostRecentCall.args[1]({});
-            expect(msg).toEqual(defaultMessageReload);
-
-        });
-
-        iit('preventing changes is temporary, and message will appear on next dirty form', function() {
-
-            
-
-            changeInputValue(theForm, 'val1');
-
-            // if directive works properly, most recently function added
-            // with `addEventListener` method, will be the onbeforeunload method
-            // which we can verify by checking the returned message
-            var msg = $window.addEventListener.mostRecentCall.args[1]({});
-
-            // expect message
-            expect(msg).toEqual(defaultMessageReload);
-
-            // -------
-
-            // simulate click on unsaved clear button
-            theButton[0].click();
-
-            // simulate page reload
-            // this should throw warning if user 
-            // has not yet cleared message
-            $location.url('/page2');
-            scope.$digest();
-            $location.url('/page1');
-            scope.$digest();
-
-
-            console.log(theForm);
-
-            // change input value
-            changeInputValue(theForm, 'val12');
-
-
-            console.log(theForm);
-
-            var msg = $window.removeEventListener.mostRecentCall.args[1]({});
-            expect(msg).toEqual(defaultMessageReload);
+            });
 
         });
 
     });
 
-    describe('Clearing messages on form submit', function() {
+    describe('Provider Configuration', function() {
 
-        it('prevents message if form is submitted', function() {});
+        describe('enable logging', function() {
+
+            it('gets logging enabled setting', function() {});
+
+            it('sets logging enabled', function() {});
+
+            describe('logging enabled', function() {
+
+                it('logs messages with 1 argument', function() {});
+
+                it('logs messages with 2 or more arguments', function() {});
+
+            });
+
+            describe('logging disabled', function() {
+
+                // @todo spy on logger
+                it('does not log', function() {});
+
+            });
+
+
+        });
+
+        describe('custom navigate message', function() {
+
+            it('has a nice default', function() {});
+
+            it('sets', function() {});
+
+            it('gets', function() {});
+
+        });
+
+        describe('custom reload message', function() {
+
+            it('has a nice default', function() {});
+
+            it('sets', function() {});
+
+            it('gets', function() {});
+
+        });
+
+        describe('watch for custom event', function() {
+
+            it('defaults to $locationChangeStart', function() {});
+
+            it('sets', function() {});
+
+            it('gets', function() {});
+
+        });
+
+        describe('use translate service', function() {
+
+            it('can use translate service if available', function() {});
+
+        });
 
     });
 
