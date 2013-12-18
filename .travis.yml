@@ -1,0 +1,23 @@
+language: node_js
+node_js:
+  - 0.10
+
+env:
+  global:
+    - LOGS_DIR=/tmp/logs
+
+addons:
+  sauce_connect:
+    username: facultymatt
+    access_key: b280b942-1965-446d-90bf-e069b5cd2cf9
+
+before_script:
+  - mkdir -p $LOGS_DIR
+  - npm install -g grunt-cli
+  - npm install
+
+script:
+  - ./travis_test.sh
+
+after_script:
+  - ./travis_print_logs.sh
