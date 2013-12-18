@@ -17,10 +17,6 @@ Provides two directives for use.
 
 *** Known issue: sometimes the form is removed from expected scope. Ie: in your controller `$scope.formName` no longer works. You might need to access `$scope.$$childTail.formName`.
 
-*** Known issue: On pages with multiple forms, submitting just one of the forms will clear the alerts for the other forms, even though they are still dirty.
-
-*** Known issue: Clicking `disregard button`, then making more changes, will no longer message user, even though user has not confirmed to disregard these new changes specifically.
-
 
 ## Demo / Dev
 
