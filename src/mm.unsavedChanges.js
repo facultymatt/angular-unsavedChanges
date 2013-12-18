@@ -1,7 +1,7 @@
 angular.module('mm.unsavedChanges', [])
 
-.provider('unsavedWarningsConfig', function(){
-    
+.provider('unsavedWarningsConfig', function() {
+
     var logEnabled = false;
 
     var useTranslateService = true;
@@ -12,51 +12,51 @@ angular.module('mm.unsavedChanges', [])
 
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
 
-    this.enableLogging = function (enableLogging){
+    this.enableLogging = function(enableLogging) {
         logEnabled = enableLogging;
     };
 
-    this.setRouteEventToWatchFor = function (watchRouteEvent){
+    this.setRouteEventToWatchFor = function(watchRouteEvent) {
         routeEvent = watchRouteEvent;
     };
 
-    this.setNavigateMessage = function(newNavigateMessage){
+    this.setNavigateMessage = function(newNavigateMessage) {
         navigateMessage = newNavigateMessage;
     };
 
-    this.setReloadMessage = function(newReloadMessage){
+    this.setReloadMessage = function(newReloadMessage) {
         reloadMessage = newReloadMessage;
     };
 
-    this.setUseTranslateService = function(configUseTranslateService){
+    this.setUseTranslateService = function(configUseTranslateService) {
         useTranslateService = configUseTranslateService;
     };
-    
+
     this.$get = function() {
         return {
-            isLoggingEnabled: function(){
+            isLoggingEnabled: function() {
                 return logEnabled;
             },
-            logIfEnabled: function(){
-                if(logEnabled){
-                    if(arguments.length === 2){
-                        console.log(arguments[0],arguments[1]);    
+            logIfEnabled: function() {
+                if (logEnabled) {
+                    if (arguments.length === 2) {
+                        console.log(arguments[0], arguments[1]);
                     }
-                    if(arguments.length === 1){
-                        console.log(arguments[0]);    
+                    if (arguments.length === 1) {
+                        console.log(arguments[0]);
                     }
                 }
             },
-            getRouteEvent: function(){
+            getRouteEvent: function() {
                 return routeEvent;
             },
-            getNavigateMessage: function(){
+            getNavigateMessage: function() {
                 return navigateMessage;
             },
-            getReloadMessage: function(){
+            getReloadMessage: function() {
                 return reloadMessage;
             },
-            getUseTranslateService: function(){
+            getUseTranslateService: function() {
                 return useTranslateService;
             }
         };
@@ -76,8 +76,8 @@ angular.module('mm.unsavedChanges', [])
         reload: unsavedWarningsConfig.getReloadMessage()
     };
 
-    function translateIfAble(message){
-        if($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()){
+    function translateIfAble(message) {
+        if ($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()) {
             return $injector.get('$translate')(message);
         } else {
             return message;
@@ -85,6 +85,7 @@ angular.module('mm.unsavedChanges', [])
     }
 
     // Checks all forms, if any one is dirty will return true
+
     function allFormsClean() {
         areAllFormsClean = true;
         angular.forEach(allForms, function(item, idx) {
@@ -92,22 +93,22 @@ angular.module('mm.unsavedChanges', [])
             if (item.$dirty) {
                 areAllFormsClean = false;
             }
-            unsavedWarningsConfig.logIfEnabled("full form",item);
+            unsavedWarningsConfig.logIfEnabled("full form", item);
         });
         return areAllFormsClean; // no dirty forms were found
     }
 
     // pass form controller and adds it to the array
     this.init = function(form) {
-        unsavedWarningsConfig.logIfEnabled("adding form",form);
+        unsavedWarningsConfig.logIfEnabled("adding form", form);
         allForms.push(form);
     };
 
-    this.removeForm = function(form){
+    this.removeForm = function(form) {
         var idx = allForms.indexOf(form);
-        if(-1 !== idx){
-            allForms.splice(idx,1);
-            unsavedWarningsConfig.logIfEnabled("Removing form from watch list",form);
+        if (-1 !== idx) {
+            allForms.splice(idx, 1);
+            unsavedWarningsConfig.logIfEnabled("Removing form from watch list", form);
         }
     };
 
@@ -159,7 +160,7 @@ angular.module('mm.unsavedChanges', [])
         require: '^form',
         priority: 3000,
         link: function(scope, element, attrs, ctrl) {
-            
+
             element.bind('click', function(event) {
                 ctrl.$setPristine();
             });
@@ -185,7 +186,7 @@ angular.module('mm.unsavedChanges', [])
                 formCtrl.$setPristine();
             });
 
-            scope.$on('$destroy',function(){
+            scope.$on('$destroy', function() {
                 unsavedWarningSharedService.removeForm(formCtrl);
             });
         }
