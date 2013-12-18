@@ -4,7 +4,7 @@
         <input type="text" name="name" ng-model="user.name">
         <input type="text" name="email" ng-model="user.email">
         <button id="submitForm" type="submit">Submit Form</button>
-        <button id="clear" unsaved-warning-clear ng-disabled="demoForm.$pristine">Disregard Changes</button>    
+        <button id="clear" type="button" unsaved-warning-clear ng-disabled="demoForm.$pristine">Disregard Changes</button>    
     </form>
 
     <p>Is Form Dirty?: {{demoForm.$dirty}}</p>

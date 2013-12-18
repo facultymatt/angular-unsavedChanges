@@ -5,7 +5,7 @@
         <legend>Form 1</legend>
         <input type="text" name="name" ng-model="user1.name">
         <button type="submit">Submit Form</button>
-        <button id="clear" unsaved-warning-clear>Disregard Form 1 Changes</button>
+        <button id="clear" type="button" unsaved-warning-clear>Disregard Form 1 Changes</button>
     </form>
     <p>Is Form 1 Dirty?: {{demoForm1.$dirty}}</p>
     <p ng-show="message">Message: {{message}}</p>
@@ -24,7 +24,7 @@
         <legend>Form 3</legend>
         <input type="text" name="name" ng-model="user3.name">
         <button type="submit">Submit Form</button>
-        <button unsaved-warning-clear>Disregard Form 3 Changes</button>
+        <button type="button" unsaved-warning-clear>Disregard Form 3 Changes</button>
     </form>
     <p>Is Form 3 Dirty?: {{demoForm3.$dirty}}</p>
     <p ng-show="message">Message: {{message}}</p>
