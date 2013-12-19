@@ -3,18 +3,21 @@ describe('UnsavedChanges', function() {
     var unsavedDev,
         rootScope,
         formTemplate,
-        pageNav,
-        clearTemplate,
+        pageNav1,
+        pageNav2,
         scope,
-        formInput,
         theForm,
-        theButton,
+        theClearButton,
+        theSubmitButton,
+        pageController,
         unsavedDevProviderCache,
         defaultMessageReload,
+        defaultMessageNavigate,
         $routeProviderCache,
         $rootScope,
-        $sniffer,
+        $controller,
         $location,
+        $provide,
         $route,
         $window,
         $compile,
@@ -28,7 +31,7 @@ describe('UnsavedChanges', function() {
     //     unsavedDevProviderCache = unsavedDevProvider;
     // }));
 
-    beforeEach(module(function($compileProvider, $routeProvider) {
+    beforeEach(module(function($compileProvider, $routeProvider, $provide) {
 
         // cache the provider for access in tests
         $routeProviderCache = $routeProvider;
@@ -39,15 +42,24 @@ describe('UnsavedChanges', function() {
             .when('/page2', {})
             .otherwise({
                 redirectTo: '/page1'
-            })
+            });
+
+        mock = {
+            alert: jasmine.createSpy(),
+            alert: jasmine.createSpy(),
+            scrollTo: jasmine.createSpy()
+        };
+
+        //$provide.value('$window', mock);
 
         // setup message defaults
         defaultMessageReload = "You will lose unsaved changes if you reload this page";
+        defaultMessageNavigate = "You will lose unsaved changes if you leave this page";
 
     }));
 
     // modules
-    beforeEach(inject(function(_$rootScope_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_) {
+    beforeEach(inject(function(_$rootScope_, _$controller_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_) {
 
         // grab our injected variables
         $sniffer = _$sniffer_;
@@ -56,7 +68,16 @@ describe('UnsavedChanges', function() {
         $window = _$window_;
         $route = _$route_;
         $rootScope = _$rootScope_;
+        $controller = _$controller_;
         scope = $rootScope.$new();
+
+        //var ngView = angular.element('<div ng-view></div>');
+        //$compile(ngView)($rootScope);
+
+
+        // spies!
+        spyOn($window, 'alert').andCallFake('hello');
+        spyOn($window, 'confirm').andCallFake('hello');
 
         // build fake nav to simulate page navigation
         // @note we could do this by broadcasting $locationChangeStart
@@ -65,38 +86,39 @@ describe('UnsavedChanges', function() {
         // @note our page nav will be present across all pages
         // and tests, so we setup here. Our forms in contrast we setup 
         // in test beforeEach tests. 
-        pageNav = angular.element('<a id="page1" href="page1">Page1</a>' +
-            '<a id="page2" href="page2">Page2</a>');
+        pageNav1 = angular.element('<a id="page1" href="#/page1">Page1</a>');
+        pageNav2 = angular.element('<a id="page2" href="#/page2">Page2</a>');
 
-        $compile(pageNav)(scope);
-
+        $compile(pageNav1)(scope);
+        $compile(pageNav2)(scope);
 
         // start all tests from first page
         $location.url('/page1');
 
-        formTemplate = angular.element('<div unsaved-warning-group>' +
+        formTemplate = angular.element('<div>' +
             '<form name="testForm" unsaved-warning-form>' +
             '<input name="test" type="text" ng-model="test"/>' +
+            '<button id="submit" type="submit"></button>' +
+            '<button id="clear" type="button" unsaved-warning-clear></button>' +
             '</form>' +
-            '<a unsaved-warning-clear></a>' +
             '</div>');
 
         $compile(formTemplate)(scope);
 
         // selector for the form, since it's within the group
-        theForm = scope.$$childTail.testForm.test;
-        theButton = formTemplate.find('a');
-
-        // change input value
-        //changeInputValue(theForm, 'val1');
+        theForm = scope.$$childTail.testForm;
+        theClearButton = formTemplate.find('#clear');
+        theSubmitButton = formTemplate.find('#submit');
 
     }));
 
-    describe('Directives', function() {
+    ddescribe('Directives', function() {
 
         describe('Clear', function() {
 
-            it('registers with attr unsaved-warning-clear', function() {});
+            it('registers with attr unsaved-warning-clear', function() {
+                expect(theClearButton.hasClass('ng-scope')).toEqual(true);
+            });
 
             // it should be registered within a form...
             // @todo throw warning or document
@@ -106,13 +128,33 @@ describe('UnsavedChanges', function() {
 
         describe('Form', function() {
 
-            it('registers with attr unsaved-warning-form', function() {});
+            it('registers with attr unsaved-warning-form', function() {
+                expect(formTemplate.hasClass('ng-scope')).toEqual(true);
+            });
 
-            describe('when form is dirty', function() {
+            // we don't expose the registered elements so we'd need to spy on this?
+            // or maybe provide a getter but not setter... yeah! 
+            // it('un-registers form when scope is destroyed', function() {});
+            ddescribe('when form is dirty', function() {
 
-                it('will message user when reloading page', function() {});
+                beforeEach(function() {
+                    theForm.$dirty = true;
+                    theForm.$valid = false;
+                    theForm.$invalid = true;
+                    scope.$apply();
+                })
 
-                it('will message user when clicking link away', function() {});
+                it('will message user when reloading page', function() {
+                    $route.reload();
+                    expect($window.confirm).toHaveBeenCalledWith(defaultMessageReload);
+                    $window.confirm();
+                });
+
+                it('will message user when clicking link away', function() {
+                    $location.path('/page2');
+                    expect($window.confirm).toHaveBeenCalledWith(defaultMessageNavigate);
+                    $window.confirm();
+                });
 
                 // @note might be nice to incorporate ngRouter and 
                 // check for this? 
