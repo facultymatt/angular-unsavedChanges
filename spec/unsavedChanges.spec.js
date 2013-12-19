@@ -7,6 +7,7 @@ describe('UnsavedChanges', function() {
         pageNav2,
         scope,
         theForm,
+        parentScope,
         theClearButton,
         theSubmitButton,
         pageController,
@@ -44,13 +45,13 @@ describe('UnsavedChanges', function() {
                 redirectTo: '/page1'
             });
 
-        mock = {
-            alert: jasmine.createSpy(),
-            alert: jasmine.createSpy(),
-            scrollTo: jasmine.createSpy()
-        };
+        // mock = {
+        //     alert: jasmine.createSpy(),
+        //     alert: jasmine.createSpy(),
+        //     scrollTo: jasmine.createSpy()
+        // };
 
-        //$provide.value('$window', mock);
+        // $provide.value('$window', mock);
 
         // setup message defaults
         defaultMessageReload = "You will lose unsaved changes if you reload this page";
@@ -69,15 +70,29 @@ describe('UnsavedChanges', function() {
         $route = _$route_;
         $rootScope = _$rootScope_;
         $controller = _$controller_;
-        scope = $rootScope.$new();
+        parentScope = $rootScope.$new();
+        scope = parentScope.$new();
 
-        //var ngView = angular.element('<div ng-view></div>');
-        //$compile(ngView)($rootScope);
+        var parentController = function() {};
 
+        
 
-        // spies!
-        spyOn($window, 'alert').andCallFake('hello');
-        spyOn($window, 'confirm').andCallFake('hello');
+        var ngView = angular.element('<div ng-view></div>');
+        $compile(ngView)(parentScope);
+
+        // var pageController = $controller({
+        //     $scope: parentScope
+        // });
+
+        // var mock = function() {};
+
+        // mock.prototype.confirm = function() {
+        //     return true;
+        // }
+
+        // // spies!
+        spyOn($window, 'alert').andCallThrough();
+        spyOn($window, 'confirm').andCallThrough();
 
         // build fake nav to simulate page navigation
         // @note we could do this by broadcasting $locationChangeStart
@@ -93,7 +108,7 @@ describe('UnsavedChanges', function() {
         $compile(pageNav2)(scope);
 
         // start all tests from first page
-        $location.url('/page1');
+        //$location.url('/page1');
 
         formTemplate = angular.element('<div>' +
             '<form name="testForm" unsaved-warning-form>' +
@@ -129,7 +144,8 @@ describe('UnsavedChanges', function() {
         describe('Form', function() {
 
             it('registers with attr unsaved-warning-form', function() {
-                expect(formTemplate.hasClass('ng-scope')).toEqual(true);
+                console.log(formTemplate);
+                //expect(formTemplate.hasClass('ng-scope')).toEqual(true);
             });
 
             // we don't expose the registered elements so we'd need to spy on this?
@@ -138,22 +154,25 @@ describe('UnsavedChanges', function() {
             ddescribe('when form is dirty', function() {
 
                 beforeEach(function() {
+                    //$location.url('/page1');
+                    
+                    //scope.$apply();
+                })
+
+                iit('will message user when reloading page', function() {
+                    $location.url('/page1');
                     theForm.$dirty = true;
                     theForm.$valid = false;
                     theForm.$invalid = true;
-                    scope.$apply();
-                })
-
-                it('will message user when reloading page', function() {
-                    $route.reload();
+                    //$route.reload();
+                    parentScope.$apply();
                     expect($window.confirm).toHaveBeenCalledWith(defaultMessageReload);
-                    $window.confirm();
+                    // $window.confirm();
                 });
 
                 it('will message user when clicking link away', function() {
                     $location.path('/page2');
                     expect($window.confirm).toHaveBeenCalledWith(defaultMessageNavigate);
-                    $window.confirm();
                 });
 
                 // @note might be nice to incorporate ngRouter and 
