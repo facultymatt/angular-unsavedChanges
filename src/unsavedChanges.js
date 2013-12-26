@@ -221,7 +221,6 @@ angular
         require: '^form',
         priority: 3000,
         link: function(scope, element, attrs, formCtrl) {
-
             element.bind('click', function(event) {
                 formCtrl.$setPristine();
             });

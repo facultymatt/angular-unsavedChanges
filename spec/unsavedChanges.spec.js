@@ -18,6 +18,7 @@ describe('UnsavedChanges', function() {
         defaultMessageNavigate,
         translateProvider,
         unsavedWarningsConfig,
+        formTemplate,
         clearButton,
         $templateCache,
         $routeProviderCache,
@@ -56,14 +57,12 @@ describe('UnsavedChanges', function() {
             controllerScope = $scope;
             //console.log('hello?');
         };
-        
-        clearButton = angular.element('<button id="clear" type="button" unsaved-warning-clear>Clear</button>');
 
-        var formTemplate = angular.element('<div>' +
+        formTemplate = angular.element('<div>' +
             '<form name="testForm" unsaved-warning-form>' +
             '<input name="test" type="text" ng-model="test"/>' +
             '<button id="submit" type="submit"></button>' +
-            clearButton +
+            '<button name="clear" id="clear" type="button" unsaved-warning-clear>Clear</button>' +
             '</form>' +
             '</div>');
 
@@ -123,8 +122,9 @@ describe('UnsavedChanges', function() {
         $location.path('/page1');
         $rootScope.$digest();
 
-        // @note logs will not occur because we are not calling through
-        spyOn(console, 'log');
+        // @note logs will not occur if we are not calling through
+        spyOn(console, 'log').andCallThrough();
+        spyOn(controllerScope.testForm, '$setPristine').andCallThrough();
 
     }));
 
@@ -132,14 +132,16 @@ describe('UnsavedChanges', function() {
 
         describe('Clear', function() {
 
-            it('registers with attr unsaved-warning-clear', function() {
-                //expect(theClearButton.hasClass('ng-scope')).toEqual(true);
-                console.log(clearButton);           
-            });
+            //it('registers with attr unsaved-warning-clear', function() {});
 
-            // it should be registered within a form...
+            // needs to be registered within a form...
             // @todo throw warning or document
-            it('sets parent form to setPristine() when clicked', function() {});
+            it('calls $setPristine() on parent form when clicked', function() {
+                var clear = formTemplate.find('#clear');
+                clear.click();
+                controllerScope.$digest();
+                expect(controllerScope.testForm.$setPristine).toHaveBeenCalled();
+            });
 
         });
 
