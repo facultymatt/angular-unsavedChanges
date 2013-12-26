@@ -1,4 +1,8 @@
 # An AngularJS directive for forms that alerts user of unsaved changes.
+
+[![Build Status](https://travis-ci.org/facultymatt/angular-unsavedChanges.png?branch=develop)](https://travis-ci.org/facultymatt/angular-unsavedChanges)
+
+`bower install angular-unsavedChanges`
  
 _Dev Note: This module is still in development. However it's used in many of my production projects so it can be considered stable and battle tested._
 
