@@ -77,6 +77,10 @@ describe('UnsavedChanges', function() {
                 controller: MyCtrl,
                 template: formTemplate
             })
+            .when('/page3', {
+                controller: MyCtrl,
+                template: ''
+            })
             .otherwise({
                 redirectTo: '/page1'
             });
@@ -96,7 +100,7 @@ describe('UnsavedChanges', function() {
     }));
 
     // modules
-    beforeEach(inject(function(_$rootScope_, _$controller_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_, _$templateCache_, _unsavedWarningsConfig_) {
+    beforeEach(inject(function(_$rootScope_, _$controller_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_, _$templateCache_, _unsavedWarningsConfig_, _unsavedWarningSharedService_) {
 
         // grab our injected variables
         $sniffer = _$sniffer_;
@@ -109,6 +113,7 @@ describe('UnsavedChanges', function() {
         $templateCache = _$templateCache_;
         scope = $rootScope.$new();
         unsavedWarningsConfig = _unsavedWarningsConfig_;
+        unsavedWarningSharedService = _unsavedWarningSharedService_;
 
         var parentController = function() {};
 
@@ -175,7 +180,18 @@ describe('UnsavedChanges', function() {
                 expect(controllerScope.$parent.$$listeners.$locationChangeStart.toString()).toContain('!allFormsClean()');
             });
 
-            it('removes listener when scope is destroyed', function() {});
+            it('Un-registers form when scope is destroyed', function() {
+                expect(unsavedWarningSharedService.allForms().length).toEqual(1);
+                $location.path('/page3');
+                $rootScope.$digest();
+                expect(unsavedWarningSharedService.allForms().length).toEqual(0);
+            });
+
+            xit('removes all listeners if no more forms exist', function() {
+                $location.path('/page3');
+                $rootScope.$digest();
+                expect(controllerScope.$parent.$$listeners.$locationChangeStart.toString()).not.toContain('!allFormsClean()');
+            });
 
         });
 
