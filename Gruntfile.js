@@ -180,6 +180,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test:end2end', [
         'selenium:start', // - run concurrent tests
+        'test:unit', // unit test
         'protractor:singlerun' // - single run protractor
     ]);
 

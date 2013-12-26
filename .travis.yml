@@ -15,6 +15,7 @@ before_script:
   - mkdir -p $LOGS_DIR
   - npm install -g grunt-cli
   - npm install
+  - bower install
 
 script:
   - ./travis_test.sh
