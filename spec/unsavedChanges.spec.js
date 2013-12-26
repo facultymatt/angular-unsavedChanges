@@ -183,7 +183,7 @@ describe('UnsavedChanges', function() {
 
     describe('Provider Configuration', function() {
 
-        ddescribe('enable logging', function() {
+        describe('enable logging', function() {
 
             it('defaults to false', function() {
                 expect(unsavedWarningsConfigProviderCache.logEnabled).toEqual(false);
@@ -201,12 +201,12 @@ describe('UnsavedChanges', function() {
                 });
 
                 it('logs messages with 1 argument', function() {
-                    unsavedWarningsConfig.logIfEnabled('testing');
+                    unsavedWarningsConfig.log('testing');
                     expect(console.log).toHaveBeenCalledWith('testing');
                 });
 
                 it('logs messages with 2 or more arguments', function() {
-                    unsavedWarningsConfig.logIfEnabled('testing', 'second', 'third');
+                    unsavedWarningsConfig.log('testing', 'second', 'third');
                     expect(console.log).toHaveBeenCalledWith('testing', 'second', 'third');
                 });
 
@@ -215,7 +215,7 @@ describe('UnsavedChanges', function() {
             describe('logging disabled', function() {
 
                 it('does not log', function() {
-                    unsavedWarningsConfig.logIfEnabled('testing', 'second', 'third');
+                    unsavedWarningsConfig.log('testing', 'second', 'third');
                     expect(console.log).not.toHaveBeenCalled();
                 });
 
@@ -283,11 +283,11 @@ describe('UnsavedChanges', function() {
 
             it('defaults to using the translate service, if available', function() {
                 unsavedWarningsConfigProviderCache.useTranslateService = false;
-                expect(unsavedWarningsConfig.getNavigateMessageTranslated()).toEqual('TEST');
+                expect(unsavedWarningsConfig.navigateMessage).toEqual('TEST');
             });
 
             it('can use translate service if available', function() {
-                expect(unsavedWarningsConfig.getNavigateMessageTranslated()).toEqual('¡hola');
+                expect(unsavedWarningsConfig.navigateMessage).toEqual('¡hola');
             });
 
         });

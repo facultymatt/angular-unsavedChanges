@@ -130,15 +130,14 @@ angular
     // @todo make noop
     var removeFunction = function() {};
 
-    // messages. Change here is you need 
+    // save shorthand reference to messages
     var messages = {
         navigate: unsavedWarningsConfig.navigateMessage,
         reload: unsavedWarningsConfig.getReloadMessage
     };
 
-
-    // Checks all forms, if any one is dirty will return true
-
+    // Check all registered forms 
+    // if any one is dirty function will return true
     function allFormsClean() {
         areAllFormsClean = true;
         angular.forEach(allForms, function(item, idx) {
@@ -146,14 +145,14 @@ angular
             if (item.$dirty) {
                 areAllFormsClean = false;
             }
-            unsavedWarningsConfig.log("full form", item);
         });
         return areAllFormsClean; // no dirty forms were found
     }
 
-    // pass form controller and adds it to the array
+    // adds form controller to registered forms array
+    // this array will be checked when user navigates away from page
     this.init = function(form) {
-        unsavedWarningsConfig.log("adding form", form);
+        unsavedWarningsConfig.log("Registering form", form);
         allForms.push(form);
     };
 
@@ -190,18 +189,18 @@ angular
 
     // calling this function later will unbind this, acting as $off()
     removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-        unsavedWarningsConfig.log("user is moving");
+        unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
         // @todo this could be written a lot cleaner! 
         if (!allFormsClean()) {
-            unsavedWarningsConfig.log("form is dirty");
+            unsavedWarningsConfig.log("a form is dirty");
             if (!confirm(messages.navigate)) {
                 unsavedWarningsConfig.log("user wants to cancel leaving");
                 event.preventDefault(); // user clicks cancel, wants to stay on page 
             } else {
-                unsavedWarningsConfig.log("user doesnt care about loosing stuff");
+                unsavedWarningsConfig.log("user doesn't care about loosing stuff");
             }
         } else {
-            unsavedWarningsConfig.log("form is clean");
+            unsavedWarningsConfig.log("all forms are clean");
         }
 
     });
