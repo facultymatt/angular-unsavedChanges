@@ -1,8 +1,9 @@
 'use strict';
-
+/*jshint globalstrict: true*/
+/*jshint undef:false */
 
 angular
-.module('unsavedChanges', [])
+    .module('unsavedChanges', [])
 
 .provider('unsavedWarningsConfig', function() {
 
@@ -67,7 +68,11 @@ angular
                 logIfEnabled: function() {
                     if (console.log && logEnabled && arguments.length) {
                         var newarr = [].slice.call(arguments);
-                        (typeof console.log === 'object' ? log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
+                        if (typeof console.log === 'object') {
+                            log.apply.call(console.log, console, newarr);
+                        } else {
+                            console.log.apply(console, newarr);
+                        }
                     }
                 },
                 getNavigateMessageTranslated: function() {
