@@ -46,6 +46,7 @@ exports.config = {
     'username': 'facultymatt',
     'accessKey': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
     'browserName': 'chrome',
+    'tunnelIdentifier': process.env.TRAVIS_JOB_NUMBER
     //'version': '7',
     //'platform': 'XP'
   },
