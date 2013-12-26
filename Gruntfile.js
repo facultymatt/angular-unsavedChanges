@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             },
             singlerun: {},
             travis: {
-                configFile: './protractor_travis.conf.js'
+                configFile: './protractor.conf.js'
             },
             auto: {
                 keepAlive: true,
