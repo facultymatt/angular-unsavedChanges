@@ -52,7 +52,6 @@
     "grunt-jsbeautifier": "~0.2.3",
     "grunt-angular-templates": "~0.4.7",
     "grunt-replace": "~0.5.1",
-    "grunt-spritesmith": "~1.12.0",
     "grunt-strip": "~0.2.1",
     "grunt-contrib-jshint": "~0.6.3",
     "grunt-yui-compressor": "~0.3.0"
