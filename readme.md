@@ -72,3 +72,6 @@ __Unit Tests__
 - Run `$ grunt test:unit` OR `$ grunt test`
 
 
+## Build
+
+Run `$ grunt` to lint and minify the code. Also strips console logs. 
