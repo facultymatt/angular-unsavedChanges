@@ -123,33 +123,8 @@ describe('UnsavedChanges', function() {
         $location.path('/page1');
         $rootScope.$digest();
 
-
-
-        // MyCtrl = function($scope) {
-        //   controllerScope = $scope;
-        //   log.push('ctrl-init');
-        // };
-
-
-
-        // var pageController = $controller({
-        //     $scope: parentScope
-        // });
-
-        // var mock = function() {};
-
-        // mock.prototype.confirm = function() {
-        //     return true;
-        // }
-
-        // // spies!
-        spyOn(console, 'log').andCallThrough();
-        // spyOn($window, 'confirm').andCallThrough();
-
-        // // selector for the form, since it's within the group
-        // theForm = scope.$$childTail.testForm;
-        // theClearButton = formTemplate.find('#clear');
-        // theSubmitButton = formTemplate.find('#submit');
+        // @note logs will not occur because we are not calling through
+        spyOn(console, 'log');
 
     }));
 
