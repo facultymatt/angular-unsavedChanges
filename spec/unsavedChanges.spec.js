@@ -175,6 +175,8 @@ describe('UnsavedChanges', function() {
                 expect(controllerScope.$parent.$$listeners.$locationChangeStart.toString()).toContain('!allFormsClean()');
             });
 
+            it('removes listener when scope is destroyed', function() {});
+
         });
 
     });
