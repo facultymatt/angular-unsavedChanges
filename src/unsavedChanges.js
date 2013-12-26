@@ -209,11 +209,12 @@ angular.module('unsavedChanges', [])
         scope: true,
         require: '^form',
         priority: 3000,
-        link: function(scope, element, attrs, ctrl) {
+        link: function(scope, element, attrs, formCtrl) {
 
             element.bind('click', function(event) {
-                ctrl.$setPristine();
+                formCtrl.$setPristine();
             });
+            
         }
     };
 })
