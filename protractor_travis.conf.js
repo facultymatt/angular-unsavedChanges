@@ -12,7 +12,7 @@ exports.config = {
 
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
-  seleniumPort: null,
+  seleniumPort: 'http://localhost:4445/wd/hub',
   // Chromedriver location is used to help the selenium standalone server
   // find chromedriver. This will be passed to the selenium jar as
   // the system property webdriver.chrome.driver. If null, selenium will
@@ -25,8 +25,8 @@ exports.config = {
 
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
   // The tests will be run remotely using SauceLabs.
-  sauceUser: 'facultymatt',
-  sauceKey: 'b280b942-1965-446d-90bf-e069b5cd2cf9',
+  //sauceUser: 'facultymatt',
+  //sauceKey: 'b280b942-1965-446d-90bf-e069b5cd2cf9',
 
   // ----- What tests to run -----
   //
