@@ -25,11 +25,14 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.x",
+    "angular": "~1.2.5",
     "angular-route": "~1.2.2",
     "angular-mocks": "~1.2.2",
     "angular-scenario": "~1.2.2",
     "jquery": "~2.0.3",
     "angular-translate": "latest"
+  },
+  "resolutions": {
+    "angular": "~1.2.5"
   }
 }
