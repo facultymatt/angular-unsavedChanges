@@ -16,6 +16,7 @@ module.exports = function(config) {
       'demo/bower_components/angular/angular.js',
       'demo/bower_components/angular-mocks/angular-mocks.js',
       'demo/bower_components/angular-route/angular-route.js',
+      'demo/bower_components/angular-translate/angular-translate.js',
       //'demo/bower_components/angular-scenario/angular-scenario.js',
       //'node_modules/karma-ng-scenario/lib/adapter.js',
       'src/unsavedChanges.js',
