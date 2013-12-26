@@ -221,13 +221,9 @@ angular.module('unsavedChanges', [])
 .directive('unsavedWarningForm', function(unsavedWarningSharedService) {
     return {
         require: 'form',
-        link: function(scope, formElement, attrs, ctrl) {
+        link: function(scope, formElement, attrs, formCtrl) {
 
-            // controllers will be array in order they were required
-            // save them here for ease of use
-            var formCtrl = ctrl;
-
-            // initialize
+            // register this form
             unsavedWarningSharedService.init(formCtrl);
 
             // bind to form submit, this makes the typical submit button work
