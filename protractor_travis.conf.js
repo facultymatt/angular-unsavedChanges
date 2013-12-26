@@ -10,7 +10,7 @@ exports.config = {
   //    running.
   // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
 
-  seleniumAddress: 'http://facultymatt:b280b942-1965-446d-90bf-e069b5cd2cf9@localhost:4445/wd/hub',
+  //seleniumAddress: 'http://facultymatt:b280b942-1965-446d-90bf-e069b5cd2cf9@localhost:4445/wd/hub',
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
   seleniumPort: null,
@@ -26,8 +26,8 @@ exports.config = {
 
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
   // The tests will be run remotely using SauceLabs.
-  //sauceUser: 'facultymatt',
-  //sauceKey: 'b280b942-1965-446d-90bf-e069b5cd2cf9',
+  sauceUser: 'facultymatt',
+  sauceKey: 'b280b942-1965-446d-90bf-e069b5cd2cf9',
 
   // ----- What tests to run -----
   //
@@ -43,8 +43,8 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
-    'username': 'facultymatt',
-    'accessKey': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
+    //'username': 'facultymatt',
+    //'accessKey': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
     'browserName': 'chrome',
     'tunnelIdentifier': process.env.TRAVIS_JOB_NUMBER
     //'version': '7',
