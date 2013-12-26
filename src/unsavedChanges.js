@@ -62,6 +62,15 @@ angular
 
     this.$get = ['$injector',
         function($injector) {
+
+            function translateIfAble(message) {
+                if ($injector.has('$translate') && useTranslateService) {
+                    return $injector.get('$translate')(message);
+                } else {
+                    return false;
+                }
+            }
+
             var publicInterface = {
                 // log function that accepts any number of arguments
                 // @see http://stackoverflow.com/a/7942355/1738217
@@ -74,12 +83,6 @@ angular
                             console.log.apply(console, newarr);
                         }
                     }
-                },
-                getNavigateMessageTranslated: function() {
-                    if (useTranslateService && $injector.has('$translate')) {
-                        return $injector.get('$translate')(navigateMessage);
-                    }
-                    return navigateMessage;
                 }
             };
 
@@ -91,13 +94,13 @@ angular
 
             Object.defineProperty(publicInterface, 'reloadMessage', {
                 get: function() {
-                    return reloadMessage;
+                    return translateIfAble(reloadMessage) || reloadMessage;
                 }
             });
 
             Object.defineProperty(publicInterface, 'navigateMessage', {
                 get: function() {
-                    return navigateMessage;
+                    return translateIfAble(navigateMessage) || navigateMessage;
                 }
             });
 
@@ -133,13 +136,6 @@ angular
         reload: unsavedWarningsConfig.getReloadMessage
     };
 
-    function translateIfAble(message) {
-        if ($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()) {
-            return $injector.get('$translate')(message);
-        } else {
-            return message;
-        }
-    }
 
     // Checks all forms, if any one is dirty will return true
 
@@ -179,7 +175,7 @@ angular
     this.confirmExit = function() {
         // @todo this could be written a lot cleaner! 
         if (!allFormsClean()) {
-            return translateIfAble(messages.reload);
+            return messages.reload;
         } else {
             removeFunction();
             window.onbeforeunload = null;
@@ -198,7 +194,7 @@ angular
         // @todo this could be written a lot cleaner! 
         if (!allFormsClean()) {
             unsavedWarningsConfig.log("form is dirty");
-            if (!confirm(translateIfAble(messages.navigate))) {
+            if (!confirm(messages.navigate)) {
                 unsavedWarningsConfig.log("user wants to cancel leaving");
                 event.preventDefault(); // user clicks cancel, wants to stay on page 
             } else {
