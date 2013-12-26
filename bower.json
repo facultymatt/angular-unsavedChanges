@@ -9,7 +9,12 @@
   "main": "unsavedChanges.js",
   "keywords": [
     "form",
-    "angularjs"
+    "angularjs",
+    "unsaved",
+    "changes",
+    "warning",
+    "dirty",
+    "reload"
   ],
   "license": "MIT",
   "ignore": [
