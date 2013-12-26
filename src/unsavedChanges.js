@@ -127,6 +127,10 @@ angular
     var allForms = [];
     var areAllFormsClean = true;
 
+    this.allForms = function() {
+        return allForms;
+    };
+
     // @todo make noop
     var removeFunction = function() {};
 
