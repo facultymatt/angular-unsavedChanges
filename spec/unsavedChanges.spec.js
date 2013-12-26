@@ -138,7 +138,7 @@ describe('UnsavedChanges', function() {
         // }
 
         // // spies!
-        // spyOn($window, 'alert').andCallThrough();
+        spyOn(console, 'log').andCallThrough();
         // spyOn($window, 'confirm').andCallThrough();
 
         // // selector for the form, since it's within the group
@@ -183,29 +183,46 @@ describe('UnsavedChanges', function() {
 
     describe('Provider Configuration', function() {
 
-        // describe('enable logging', function() {
+        ddescribe('enable logging', function() {
 
-        //     it('gets logging enabled setting', function() {});
+            it('defaults to false', function() {
+                expect(unsavedWarningsConfigProviderCache.logEnabled).toEqual(false);
+            });
 
-        //     it('sets logging enabled', function() {});
+            it('sets logging enabled', function() {
+                unsavedWarningsConfigProviderCache.logEnabled = true;
+                expect(unsavedWarningsConfig.logEnabled).toEqual(true);
+            });
 
-        //     describe('logging enabled', function() {
+            describe('logging enabled', function() {
 
-        //         it('logs messages with 1 argument', function() {});
+                beforeEach(function() {
+                    unsavedWarningsConfigProviderCache.logEnabled = true;
+                });
 
-        //         it('logs messages with 2 or more arguments', function() {});
+                it('logs messages with 1 argument', function() {
+                    unsavedWarningsConfig.logIfEnabled('testing');
+                    expect(console.log).toHaveBeenCalledWith('testing');
+                });
 
-        //     });
+                it('logs messages with 2 or more arguments', function() {
+                    unsavedWarningsConfig.logIfEnabled('testing', 'second', 'third');
+                    expect(console.log).toHaveBeenCalledWith('testing', 'second', 'third');
+                });
 
-        //     describe('logging disabled', function() {
+            });
 
-        //         // @todo spy on logger
-        //         it('does not log', function() {});
+            describe('logging disabled', function() {
 
-        //     });
+                it('does not log', function() {
+                    unsavedWarningsConfig.logIfEnabled('testing', 'second', 'third');
+                    expect(console.log).not.toHaveBeenCalled();
+                });
+
+            });
 
 
-        // });
+        });
 
         describe('custom navigate message', function() {
 

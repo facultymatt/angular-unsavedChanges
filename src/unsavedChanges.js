@@ -41,9 +41,14 @@ angular.module('unsavedChanges', [])
                 if (logEnabled) {
                     if (arguments.length === 2) {
                         console.log(arguments[0], arguments[1]);
+                // log function that accepts any number of arguments
+                // @see http://stackoverflow.com/a/7942355/1738217
+                logIfEnabled: function() {
+                    if (console.log && logEnabled && arguments.length) {
+                        arguments.callee = arguments.callee.caller;
+                        var newarr = [].slice.call(arguments);
+                        (typeof console.log === 'object' ? log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
                     }
-                    if (arguments.length === 1) {
-                        console.log(arguments[0]);
                     }
                 }
             },
