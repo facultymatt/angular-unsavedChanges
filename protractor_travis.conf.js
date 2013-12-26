@@ -10,9 +10,10 @@ exports.config = {
   //    running.
   // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
 
+  seleniumAddress: 'http://localhost:4445/wd/hub'
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
-  seleniumPort: 'http://localhost:4445/wd/hub',
+  seleniumPort: null,
   // Chromedriver location is used to help the selenium standalone server
   // find chromedriver. This will be passed to the selenium jar as
   // the system property webdriver.chrome.driver. If null, selenium will
