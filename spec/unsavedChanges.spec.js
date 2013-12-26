@@ -187,10 +187,10 @@ describe('UnsavedChanges', function() {
                 expect(unsavedWarningSharedService.allForms().length).toEqual(0);
             });
 
-            xit('removes all listeners if no more forms exist', function() {
+            it('removes listeners if no more forms exist', function() {
                 $location.path('/page3');
                 $rootScope.$digest();
-                expect(controllerScope.$parent.$$listeners.$locationChangeStart.toString()).not.toContain('!allFormsClean()');
+                expect($window.onbeforeunload).toEqual(null);
             });
 
         });

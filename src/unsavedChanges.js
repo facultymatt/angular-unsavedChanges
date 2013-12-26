@@ -166,6 +166,10 @@ angular
             allForms.splice(idx, 1);
             unsavedWarningsConfig.log("Removing form from watch list", form);
         }
+        if(allForms.length === 0) {
+            removeFunction();
+            window.onbeforeunload = null;
+        }
     };
 
     this.removePrompt = function() {
