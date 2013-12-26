@@ -44,7 +44,7 @@ exports.config = {
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
     'username': 'facultymatt',
-    'access-key': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
+    'accessKey': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
     'browserName': 'chrome',
     //'version': '7',
     //'platform': 'XP'
