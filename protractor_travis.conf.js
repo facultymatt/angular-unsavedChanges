@@ -10,7 +10,7 @@ exports.config = {
   //    running.
   // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
 
-  seleniumAddress: 'http://facultymatt:b280b942-1965-446d-90bf-e069b5cd2cf9@ondemand.saucelabs.com:80/wd/hub',
+  seleniumAddress: 'http://facultymatt:b280b942-1965-446d-90bf-e069b5cd2cf9@localhost:4445/wd/hub',
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
   seleniumPort: null,
@@ -53,7 +53,7 @@ exports.config = {
 
   // A base URL for your application under test. Calls to protractor.get()
   // with relative paths will be prepended with this.
-  baseUrl: 'http://localhost:4445',
+  baseUrl: 'http://localhost:9999',
 
   // Selector for the element housing the angular app - this defaults to
   // body, but is necessary if ng-app is on a descendant of <body>  

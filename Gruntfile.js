@@ -43,7 +43,7 @@ module.exports = function(grunt) {
             },
             travisServer: {
                 options: {
-                    port: 4445
+                    port: 9999
                 }
             },
         },
