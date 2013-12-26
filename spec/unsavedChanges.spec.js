@@ -3,6 +3,7 @@ describe('UnsavedChanges', function() {
     var unsavedDev,
         rootScope,
         formTemplate,
+        ngView,
         pageNav1,
         pageNav2,
         scope,
@@ -15,6 +16,10 @@ describe('UnsavedChanges', function() {
         unsavedDevProviderCache,
         defaultMessageReload,
         defaultMessageNavigate,
+        translateProvider,
+        unsavedWarningsConfig,
+        clearButton,
+        $templateCache,
         $routeProviderCache,
         $rootScope,
         $controller,
@@ -26,22 +31,52 @@ describe('UnsavedChanges', function() {
         $scope;
 
     beforeEach(module('ngRoute'));
-    beforeEach(module('mm.unsavedChanges'));
+    beforeEach(module('unsavedChanges'));
+    beforeEach(module('pascalprecht.translate'));
 
     // cache providers
-    // beforeEach(module(function(unsavedDevProvider) {
-    //     unsavedDevProviderCache = unsavedDevProvider;
-    // }));
-
-    beforeEach(module(function($compileProvider, $routeProvider, $provide) {
+    beforeEach(module(function($compileProvider, $routeProvider, $provide, unsavedWarningsConfigProvider, $translateProvider) {
 
         // cache the provider for access in tests
         $routeProviderCache = $routeProvider;
+        unsavedWarningsConfigProviderCache = unsavedWarningsConfigProvider;
+        translateProvider = $translateProvider;
+
+        translateProvider.translations('en', {
+            TEST: 'Hello'
+        }).translations('es', {
+            TEST: '¡hola'
+        });
+
+        translateProvider.preferredLanguage('es');
+        translateProvider.fallbackLanguage('en');
+
+        function MyCtrl($scope) {
+            //$scope.state = 'WORKS';
+            controllerScope = $scope;
+            //console.log('hello?');
+        };
+        
+        clearButton = angular.element('<button id="clear" type="button" unsaved-warning-clear>Clear</button>');
+
+        var formTemplate = angular.element('<div>' +
+            '<form name="testForm" unsaved-warning-form>' +
+            '<input name="test" type="text" ng-model="test"/>' +
+            '<button id="submit" type="submit"></button>' +
+            clearButton +
+            '</form>' +
+            '</div>');
 
         // setup test routes
         $routeProviderCache
-            .when('/page1', {})
-            .when('/page2', {})
+            .when('/page1', {
+                controller: MyCtrl,
+                template: formTemplate
+            })
+            .when('/page2', {
+                controller: MyCtrl,
+                template: formTemplate
+            })
             .otherwise({
                 redirectTo: '/page1'
             });
@@ -61,7 +96,7 @@ describe('UnsavedChanges', function() {
     }));
 
     // modules
-    beforeEach(inject(function(_$rootScope_, _$controller_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_) {
+    beforeEach(inject(function(_$rootScope_, _$controller_, _$compile_, _$sniffer_, _$location_, _$window_, _$route_, _$templateCache_, _unsavedWarningsConfig_) {
 
         // grab our injected variables
         $sniffer = _$sniffer_;
@@ -71,15 +106,26 @@ describe('UnsavedChanges', function() {
         $route = _$route_;
         $rootScope = _$rootScope_;
         $controller = _$controller_;
-        parentScope = $rootScope.$new();
-        scope = parentScope.$new();
+        $templateCache = _$templateCache_;
+        scope = $rootScope.$new();
+        unsavedWarningsConfig = _unsavedWarningsConfig_;
 
         var parentController = function() {};
 
-        
+        ngView = angular.element('<div ng-view></div>');
+        $compile(ngView)($rootScope);
 
-        var ngView = angular.element('<div ng-view></div>');
-        $compile(ngView)(parentScope);
+        $location.path('/page1');
+        $rootScope.$digest();
+
+
+
+        // MyCtrl = function($scope) {
+        //   controllerScope = $scope;
+        //   log.push('ctrl-init');
+        // };
+
+
 
         // var pageController = $controller({
         //     $scope: parentScope
@@ -92,48 +138,23 @@ describe('UnsavedChanges', function() {
         // }
 
         // // spies!
-        spyOn($window, 'alert').andCallThrough();
-        spyOn($window, 'confirm').andCallThrough();
+        // spyOn($window, 'alert').andCallThrough();
+        // spyOn($window, 'confirm').andCallThrough();
 
-        // build fake nav to simulate page navigation
-        // @note we could do this by broadcasting $locationChangeStart
-        // but this will simulate our terminated navigation too
-        //
-        // @note our page nav will be present across all pages
-        // and tests, so we setup here. Our forms in contrast we setup 
-        // in test beforeEach tests. 
-        pageNav1 = angular.element('<a id="page1" href="#/page1">Page1</a>');
-        pageNav2 = angular.element('<a id="page2" href="#/page2">Page2</a>');
-
-        $compile(pageNav1)(scope);
-        $compile(pageNav2)(scope);
-
-        // start all tests from first page
-        //$location.url('/page1');
-
-        formTemplate = angular.element('<div>' +
-            '<form name="testForm" unsaved-warning-form>' +
-            '<input name="test" type="text" ng-model="test"/>' +
-            '<button id="submit" type="submit"></button>' +
-            '<button id="clear" type="button" unsaved-warning-clear></button>' +
-            '</form>' +
-            '</div>');
-
-        $compile(formTemplate)(scope);
-
-        // selector for the form, since it's within the group
-        theForm = scope.$$childTail.testForm;
-        theClearButton = formTemplate.find('#clear');
-        theSubmitButton = formTemplate.find('#submit');
+        // // selector for the form, since it's within the group
+        // theForm = scope.$$childTail.testForm;
+        // theClearButton = formTemplate.find('#clear');
+        // theSubmitButton = formTemplate.find('#submit');
 
     }));
 
-    ddescribe('Directives', function() {
+    describe('Directives', function() {
 
         describe('Clear', function() {
 
             it('registers with attr unsaved-warning-clear', function() {
-                expect(theClearButton.hasClass('ng-scope')).toEqual(true);
+                //expect(theClearButton.hasClass('ng-scope')).toEqual(true);
+                console.log(clearButton);           
             });
 
             // it should be registered within a form...
@@ -144,44 +165,14 @@ describe('UnsavedChanges', function() {
 
         describe('Form', function() {
 
-            it('registers with attr unsaved-warning-form', function() {
-                console.log(formTemplate);
-                //expect(formTemplate.hasClass('ng-scope')).toEqual(true);
+            //it('registers with attr unsaved-warning-form', function() {});
+
+            it('adds listener to onbeforeunload to detect page reload', function() {
+                expect($window.onbeforeunload.toString()).toContain('allFormsClean()');
             });
 
-            // we don't expose the registered elements so we'd need to spy on this?
-            // or maybe provide a getter but not setter... yeah! 
-            // it('un-registers form when scope is destroyed', function() {});
-            ddescribe('when form is dirty', function() {
-
-                beforeEach(function() {
-                    //$location.url('/page1');
-                    
-                    //scope.$apply();
-                })
-
-                iit('will message user when reloading page', function() {
-                    $location.url('/page1');
-                    theForm.$dirty = true;
-                    theForm.$valid = false;
-                    theForm.$invalid = true;
-                    //$route.reload();
-                    parentScope.$apply();
-                    expect($window.confirm).toHaveBeenCalledWith(defaultMessageReload);
-                    // $window.confirm();
-                });
-
-                it('will message user when clicking link away', function() {
-                    $location.path('/page2');
-                    expect($window.confirm).toHaveBeenCalledWith(defaultMessageNavigate);
-                });
-
-                // @note might be nice to incorporate ngRouter and 
-                // check for this? 
-                //it('will message user when changing state', function() {});
-
-                it('will message user when navigating back', function() {});
-
+            it('adds listener $locationChangeStart', function() {
+                expect(controllerScope.$parent.$$listeners.$locationChangeStart.toString()).toContain('!allFormsClean()');
             });
 
         });
@@ -190,63 +181,95 @@ describe('UnsavedChanges', function() {
 
     describe('Provider Configuration', function() {
 
-        describe('enable logging', function() {
+        // describe('enable logging', function() {
 
-            it('gets logging enabled setting', function() {});
+        //     it('gets logging enabled setting', function() {});
 
-            it('sets logging enabled', function() {});
+        //     it('sets logging enabled', function() {});
 
-            describe('logging enabled', function() {
+        //     describe('logging enabled', function() {
 
-                it('logs messages with 1 argument', function() {});
+        //         it('logs messages with 1 argument', function() {});
 
-                it('logs messages with 2 or more arguments', function() {});
+        //         it('logs messages with 2 or more arguments', function() {});
 
-            });
+        //     });
 
-            describe('logging disabled', function() {
+        //     describe('logging disabled', function() {
 
-                // @todo spy on logger
-                it('does not log', function() {});
+        //         // @todo spy on logger
+        //         it('does not log', function() {});
 
-            });
+        //     });
 
 
-        });
+        // });
 
         describe('custom navigate message', function() {
 
-            it('has a nice default', function() {});
+            it('has a nice default', function() {
+                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual(defaultMessageNavigate);
+            });
 
-            it('sets', function() {});
+            it('sets config', function() {
+                unsavedWarningsConfigProviderCache.setNavigateMessage('Testing!');
+                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual('Testing!');
+            });
 
-            it('gets', function() {});
+            it('gets at runtime', function() {
+                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual(defaultMessageNavigate);
+            });
 
         });
 
         describe('custom reload message', function() {
 
-            it('has a nice default', function() {});
+            it('has a nice default', function() {
+                expect(unsavedWarningsConfig.getReloadMessage()).toEqual(defaultMessageReload);
+            });
 
-            it('sets', function() {});
+            it('sets in config', function() {
+                unsavedWarningsConfigProviderCache.setReloadMessage('Testing!');
+                expect(unsavedWarningsConfig.getReloadMessage()).toEqual('Testing!');
+            });
 
-            it('gets', function() {});
+            it('gets at runtime', function() {
+                expect(unsavedWarningsConfig.getReloadMessage()).toEqual(defaultMessageReload);
+            });
 
         });
 
         describe('watch for custom event', function() {
 
-            it('defaults to $locationChangeStart', function() {});
+            it('defaults to $locationChangeStart', function() {
+                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$locationChangeStart');
+            });
 
-            it('sets', function() {});
+            it('sets in config', function() {
+                unsavedWarningsConfigProviderCache.setRouteEventToWatchFor('$hotDamn')
+                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$hotDamn');
+            });
 
-            it('gets', function() {});
+            it('gets at runtime', function() {
+                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$locationChangeStart');
+            });
 
         });
 
         describe('use translate service', function() {
+            
+            beforeEach(function() {
+                unsavedWarningsConfigProviderCache.setNavigateMessage('TEST');
+            })
 
-            it('can use translate service if available', function() {});
+            it('defaults to using the translate service, if available', function() {
+                unsavedWarningsConfigProviderCache.setUseTranslateService(false);
+                expect(unsavedWarningsConfig.getNavigateMessageTranslated()).toEqual('TEST');
+            });
+
+            it('can use translate service if available', function() {
+                expect(unsavedWarningsConfig.getNavigateMessageTranslated()).toEqual('¡hola');
+            });
 
         });
 
