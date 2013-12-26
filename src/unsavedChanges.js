@@ -1,4 +1,8 @@
-angular.module('unsavedChanges', [])
+'use strict';
+
+
+angular
+.module('unsavedChanges', [])
 
 .provider('unsavedWarningsConfig', function() {
 
@@ -62,7 +66,6 @@ angular.module('unsavedChanges', [])
                 // @see http://stackoverflow.com/a/7942355/1738217
                 logIfEnabled: function() {
                     if (console.log && logEnabled && arguments.length) {
-                        arguments.callee = arguments.callee.caller;
                         var newarr = [].slice.call(arguments);
                         (typeof console.log === 'object' ? log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
                     }
@@ -214,7 +217,7 @@ angular.module('unsavedChanges', [])
             element.bind('click', function(event) {
                 formCtrl.$setPristine();
             });
-            
+
         }
     };
 })
