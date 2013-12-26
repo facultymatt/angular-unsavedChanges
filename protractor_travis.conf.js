@@ -10,7 +10,7 @@ exports.config = {
   //    running.
   // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
 
-  seleniumAddress: 'http://facultymatt:b280b942-1965-446d-90bf-e069b5cd2cf9@localhost:4445/wd/hub',
+  seleniumAddress: 'http://localhost:4445/wd/hub',
   // The port to start the selenium server on, or null if the server should
   // find its own unused port.
   seleniumPort: null,
@@ -43,6 +43,8 @@ exports.config = {
   // and
   // https://code.google.com/p/selenium/source/browse/javascript/webdriver/capabilities.js
   capabilities: {
+    'username': 'facultymatt',
+    'access-key': 'b280b942-1965-446d-90bf-e069b5cd2cf9',
     'browserName': 'chrome',
     //'version': '7',
     //'platform': 'XP'
