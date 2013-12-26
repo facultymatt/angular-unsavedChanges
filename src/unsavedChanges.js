@@ -2,45 +2,62 @@ angular.module('unsavedChanges', [])
 
 .provider('unsavedWarningsConfig', function() {
 
+    var _this = this;
+
+    // set defaults
     var logEnabled = false;
-
     var useTranslateService = true;
-
     var routeEvent = '$locationChangeStart';
-
     var navigateMessage = 'You will lose unsaved changes if you leave this page';
-
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
 
-    this.enableLogging = function(enableLogging) {
-        logEnabled = enableLogging;
-    };
+    Object.defineProperty(_this, 'navigateMessage', {
+        get: function() {
+            return navigateMessage;
+        },
+        set: function(value) {
+            navigateMessage = value;
+        }
+    });
 
-    this.setRouteEventToWatchFor = function(watchRouteEvent) {
-        routeEvent = watchRouteEvent;
-    };
+    Object.defineProperty(_this, 'reloadMessage', {
+        get: function() {
+            return reloadMessage;
+        },
+        set: function(value) {
+            reloadMessage = value;
+        }
+    });
 
-    this.setNavigateMessage = function(newNavigateMessage) {
-        navigateMessage = newNavigateMessage;
-    };
+    Object.defineProperty(_this, 'useTranslateService', {
+        get: function() {
+            return useTranslateService;
+        },
+        set: function(value) {
+            useTranslateService = !! (value);
+        }
+    });
 
-    this.setReloadMessage = function(newReloadMessage) {
-        reloadMessage = newReloadMessage;
-    };
+    Object.defineProperty(_this, 'routeEvent', {
+        get: function() {
+            return routeEvent;
+        },
+        set: function(value) {
+            routeEvent = value;
+        }
+    });
+    Object.defineProperty(_this, 'logEnabled', {
+        get: function() {
+            return logEnabled;
+        },
+        set: function(value) {
+            logEnabled = !! (value);
+        }
+    });
 
-    this.setUseTranslateService = function(configUseTranslateService) {
-        useTranslateService = configUseTranslateService;
-    };
-
-    this.$get = ['$injector', function($injector) {
-        return {
-            isLoggingEnabled: function() {
-                return logEnabled;
-            },
-            logIfEnabled: function() {
-                if (logEnabled) {
-                    if (arguments.length === 2) {
-                        console.log(arguments[0], arguments[1]);
+    this.$get = ['$injector',
+        function($injector) {
+            var publicInterface = {
                 // log function that accepts any number of arguments
                 // @see http://stackoverflow.com/a/7942355/1738217
                 logIfEnabled: function() {
@@ -49,29 +66,48 @@ angular.module('unsavedChanges', [])
                         var newarr = [].slice.call(arguments);
                         (typeof console.log === 'object' ? log.apply.call(console.log, console, newarr) : console.log.apply(console, newarr));
                     }
+                },
+                getNavigateMessageTranslated: function() {
+                    if (useTranslateService && $injector.has('$translate')) {
+                        return $injector.get('$translate')(navigateMessage);
                     }
+                    return navigateMessage;
                 }
-            },
-            getRouteEvent: function() {
-                return routeEvent;
-            },
-            getNavigateMessage: function() {
-                return navigateMessage;
-            },
-            getNavigateMessageTranslated: function() {
-                if (useTranslateService && $injector.has('$translate')) {
-                    return $injector.get('$translate')(navigateMessage);
+            };
+
+            Object.defineProperty(publicInterface, 'useTranslateService', {
+                get: function() {
+                    return useTranslateService;
                 }
-                return navigateMessage;
-            },
-            getReloadMessage: function() {
-                return reloadMessage;
-            },
-            getUseTranslateService: function() {
-                return useTranslateService;
-            }
-        };
-    }];
+            });
+
+            Object.defineProperty(publicInterface, 'reloadMessage', {
+                get: function() {
+                    return reloadMessage;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'navigateMessage', {
+                get: function() {
+                    return navigateMessage;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'routeEvent', {
+                get: function() {
+                    return routeEvent;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'logEnabled', {
+                get: function() {
+                    return logEnabled;
+                }
+            });
+
+            return publicInterface;
+        }
+    ];
 })
 
 .service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
@@ -85,8 +121,8 @@ angular.module('unsavedChanges', [])
 
     // messages. Change here is you need 
     var messages = {
-        navigate: unsavedWarningsConfig.getNavigateMessage(),
-        reload: unsavedWarningsConfig.getReloadMessage()
+        navigate: unsavedWarningsConfig.navigateMessage,
+        reload: unsavedWarningsConfig.getReloadMessage
     };
 
     function translateIfAble(message) {
@@ -146,7 +182,7 @@ angular.module('unsavedChanges', [])
     // @todo investigate new method for listening as discovered in previous tests
     window.onbeforeunload = this.confirmExit;
 
-    var eventToWatchFor = unsavedWarningsConfig.getRouteEvent();
+    var eventToWatchFor = unsavedWarningsConfig.routeEvent;
 
     // calling this function later will unbind this, acting as $off()
     removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {

@@ -227,16 +227,16 @@ describe('UnsavedChanges', function() {
         describe('custom navigate message', function() {
 
             it('has a nice default', function() {
-                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual(defaultMessageNavigate);
+                expect(unsavedWarningsConfig.navigateMessage).toEqual(defaultMessageNavigate);
             });
 
             it('sets config', function() {
-                unsavedWarningsConfigProviderCache.setNavigateMessage('Testing!');
-                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual('Testing!');
+                unsavedWarningsConfigProviderCache.navigateMessage = 'Testing!';
+                expect(unsavedWarningsConfig.navigateMessage).toEqual('Testing!');
             });
 
             it('gets at runtime', function() {
-                expect(unsavedWarningsConfig.getNavigateMessage()).toEqual(defaultMessageNavigate);
+                expect(unsavedWarningsConfig.navigateMessage).toEqual(defaultMessageNavigate);
             });
 
         });
@@ -244,16 +244,16 @@ describe('UnsavedChanges', function() {
         describe('custom reload message', function() {
 
             it('has a nice default', function() {
-                expect(unsavedWarningsConfig.getReloadMessage()).toEqual(defaultMessageReload);
+                expect(unsavedWarningsConfig.reloadMessage).toEqual(defaultMessageReload);
             });
 
             it('sets in config', function() {
-                unsavedWarningsConfigProviderCache.setReloadMessage('Testing!');
-                expect(unsavedWarningsConfig.getReloadMessage()).toEqual('Testing!');
+                unsavedWarningsConfigProviderCache.reloadMessage = 'Testing!';
+                expect(unsavedWarningsConfig.reloadMessage).toEqual('Testing!');
             });
 
             it('gets at runtime', function() {
-                expect(unsavedWarningsConfig.getReloadMessage()).toEqual(defaultMessageReload);
+                expect(unsavedWarningsConfig.reloadMessage).toEqual(defaultMessageReload);
             });
 
         });
@@ -261,16 +261,16 @@ describe('UnsavedChanges', function() {
         describe('watch for custom event', function() {
 
             it('defaults to $locationChangeStart', function() {
-                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$locationChangeStart');
+                expect(unsavedWarningsConfig.routeEvent).toEqual('$locationChangeStart');
             });
 
             it('sets in config', function() {
-                unsavedWarningsConfigProviderCache.setRouteEventToWatchFor('$hotDamn')
-                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$hotDamn');
+                unsavedWarningsConfigProviderCache.routeEvent = '$hotDamn';
+                expect(unsavedWarningsConfig.routeEvent).toEqual('$hotDamn');
             });
 
             it('gets at runtime', function() {
-                expect(unsavedWarningsConfig.getRouteEvent()).toEqual('$locationChangeStart');
+                expect(unsavedWarningsConfig.routeEvent).toEqual('$locationChangeStart');
             });
 
         });
@@ -278,11 +278,11 @@ describe('UnsavedChanges', function() {
         describe('use translate service', function() {
             
             beforeEach(function() {
-                unsavedWarningsConfigProviderCache.setNavigateMessage('TEST');
+                unsavedWarningsConfigProviderCache.navigateMessage = 'TEST';
             })
 
             it('defaults to using the translate service, if available', function() {
-                unsavedWarningsConfigProviderCache.setUseTranslateService(false);
+                unsavedWarningsConfigProviderCache.useTranslateService = false;
                 expect(unsavedWarningsConfig.getNavigateMessageTranslated()).toEqual('TEST');
             });
 
