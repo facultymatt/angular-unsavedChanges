@@ -1,4 +1,4 @@
-angular.module('mm.unsavedChanges', [])
+angular.module('unsavedChanges', [])
 
 .provider('unsavedWarningsConfig', function() {
 
@@ -32,7 +32,7 @@ angular.module('mm.unsavedChanges', [])
         useTranslateService = configUseTranslateService;
     };
 
-    this.$get = function() {
+    this.$get = ['$injector', function($injector) {
         return {
             isLoggingEnabled: function() {
                 return logEnabled;
@@ -40,10 +40,10 @@ angular.module('mm.unsavedChanges', [])
             logIfEnabled: function() {
                 if (logEnabled) {
                     if (arguments.length === 2) {
-                        console.log(arguments[0], arguments[1]);
+                        0;
                     }
                     if (arguments.length === 1) {
-                        console.log(arguments[0]);
+                        0;
                     }
                 }
             },
@@ -53,6 +53,12 @@ angular.module('mm.unsavedChanges', [])
             getNavigateMessage: function() {
                 return navigateMessage;
             },
+            getNavigateMessageTranslated: function() {
+                if (useTranslateService && $injector.has('$translate')) {
+                    return $injector.get('$translate')(navigateMessage);
+                }
+                return navigateMessage;
+            },
             getReloadMessage: function() {
                 return reloadMessage;
             },
@@ -60,7 +66,7 @@ angular.module('mm.unsavedChanges', [])
                 return useTranslateService;
             }
         };
-    };
+    }];
 })
 
 .service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
@@ -68,6 +74,8 @@ angular.module('mm.unsavedChanges', [])
     // Controller scopped variables
     var allForms = [];
     var areAllFormsClean = true;
+
+    // @todo make noop
     var removeFunction = function() {};
 
     // messages. Change here is you need 
@@ -130,6 +138,7 @@ angular.module('mm.unsavedChanges', [])
     };
 
     // bind to window close
+    // @todo investigate new method for listening as discovered in previous tests
     window.onbeforeunload = this.confirmExit;
 
     var eventToWatchFor = unsavedWarningsConfig.getRouteEvent();
@@ -186,6 +195,7 @@ angular.module('mm.unsavedChanges', [])
                 formCtrl.$setPristine();
             });
 
+            // @todo check destroy on clear button too? 
             scope.$on('$destroy', function() {
                 unsavedWarningSharedService.removeForm(formCtrl);
             });

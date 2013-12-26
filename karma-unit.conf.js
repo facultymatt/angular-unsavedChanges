@@ -18,7 +18,7 @@ module.exports = function(config) {
       'demo/bower_components/angular-route/angular-route.js',
       //'demo/bower_components/angular-scenario/angular-scenario.js',
       //'node_modules/karma-ng-scenario/lib/adapter.js',
-      'src/mm.unsavedChanges.js',
+      'src/unsavedChanges.js',
       'spec/**/*.spec.js'
     ],
     // preprocessors: {

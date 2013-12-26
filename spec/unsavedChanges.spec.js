@@ -11,6 +11,7 @@ describe('UnsavedChanges', function() {
         theClearButton,
         theSubmitButton,
         pageController,
+        unsavedChanges,
         unsavedDevProviderCache,
         defaultMessageReload,
         defaultMessageNavigate,

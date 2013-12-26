@@ -1,7 +1,7 @@
-angular.module('mm.unsavedChanges', [])
+angular.module('unsavedChanges', [])
 
-.provider('unsavedWarningsConfig', function(){
-    
+.provider('unsavedWarningsConfig', function() {
+
     var logEnabled = false;
 
     var useTranslateService = true;
@@ -12,55 +12,61 @@ angular.module('mm.unsavedChanges', [])
 
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
 
-    this.enableLogging = function (enableLogging){
+    this.enableLogging = function(enableLogging) {
         logEnabled = enableLogging;
     };
 
-    this.setRouteEventToWatchFor = function (watchRouteEvent){
+    this.setRouteEventToWatchFor = function(watchRouteEvent) {
         routeEvent = watchRouteEvent;
     };
 
-    this.setNavigateMessage = function(newNavigateMessage){
+    this.setNavigateMessage = function(newNavigateMessage) {
         navigateMessage = newNavigateMessage;
     };
 
-    this.setReloadMessage = function(newReloadMessage){
+    this.setReloadMessage = function(newReloadMessage) {
         reloadMessage = newReloadMessage;
     };
 
-    this.setUseTranslateService = function(configUseTranslateService){
+    this.setUseTranslateService = function(configUseTranslateService) {
         useTranslateService = configUseTranslateService;
     };
-    
-    this.$get = function() {
+
+    this.$get = ['$injector', function($injector) {
         return {
-            isLoggingEnabled: function(){
+            isLoggingEnabled: function() {
                 return logEnabled;
             },
-            logIfEnabled: function(){
-                if(logEnabled){
-                    if(arguments.length === 2){
-                        0;    
+            logIfEnabled: function() {
+                if (logEnabled) {
+                    if (arguments.length === 2) {
+                        console.log(arguments[0], arguments[1]);
                     }
-                    if(arguments.length === 1){
-                        0;    
+                    if (arguments.length === 1) {
+                        console.log(arguments[0]);
                     }
                 }
             },
-            getRouteEvent: function(){
+            getRouteEvent: function() {
                 return routeEvent;
             },
-            getNavigateMessage: function(){
+            getNavigateMessage: function() {
                 return navigateMessage;
             },
-            getReloadMessage: function(){
+            getNavigateMessageTranslated: function() {
+                if (useTranslateService && $injector.has('$translate')) {
+                    return $injector.get('$translate')(navigateMessage);
+                }
+                return navigateMessage;
+            },
+            getReloadMessage: function() {
                 return reloadMessage;
             },
-            getUseTranslateService: function(){
+            getUseTranslateService: function() {
                 return useTranslateService;
             }
         };
-    };
+    }];
 })
 
 .service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
@@ -68,6 +74,8 @@ angular.module('mm.unsavedChanges', [])
     // Controller scopped variables
     var allForms = [];
     var areAllFormsClean = true;
+
+    // @todo make noop
     var removeFunction = function() {};
 
     // messages. Change here is you need 
@@ -76,8 +84,8 @@ angular.module('mm.unsavedChanges', [])
         reload: unsavedWarningsConfig.getReloadMessage()
     };
 
-    function translateIfAble(message){
-        if($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()){
+    function translateIfAble(message) {
+        if ($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()) {
             return $injector.get('$translate')(message);
         } else {
             return message;
@@ -85,6 +93,7 @@ angular.module('mm.unsavedChanges', [])
     }
 
     // Checks all forms, if any one is dirty will return true
+
     function allFormsClean() {
         areAllFormsClean = true;
         angular.forEach(allForms, function(item, idx) {
@@ -92,22 +101,22 @@ angular.module('mm.unsavedChanges', [])
             if (item.$dirty) {
                 areAllFormsClean = false;
             }
-            unsavedWarningsConfig.logIfEnabled("full form",item);
+            unsavedWarningsConfig.logIfEnabled("full form", item);
         });
         return areAllFormsClean; // no dirty forms were found
     }
 
     // pass form controller and adds it to the array
     this.init = function(form) {
-        unsavedWarningsConfig.logIfEnabled("adding form",form);
+        unsavedWarningsConfig.logIfEnabled("adding form", form);
         allForms.push(form);
     };
 
-    this.removeForm = function(form){
+    this.removeForm = function(form) {
         var idx = allForms.indexOf(form);
-        if(-1 !== idx){
-            allForms.splice(idx,1);
-            unsavedWarningsConfig.logIfEnabled("Removing form from watch list",form);
+        if (-1 !== idx) {
+            allForms.splice(idx, 1);
+            unsavedWarningsConfig.logIfEnabled("Removing form from watch list", form);
         }
     };
 
@@ -129,6 +138,7 @@ angular.module('mm.unsavedChanges', [])
     };
 
     // bind to window close
+    // @todo investigate new method for listening as discovered in previous tests
     window.onbeforeunload = this.confirmExit;
 
     var eventToWatchFor = unsavedWarningsConfig.getRouteEvent();
@@ -156,11 +166,12 @@ angular.module('mm.unsavedChanges', [])
 .directive('unsavedWarningClear', function(unsavedWarningSharedService) {
     return {
         scope: true,
+        require: '^form',
         priority: 3000,
-        link: function(scope, element, attrs) {
-            
+        link: function(scope, element, attrs, ctrl) {
+
             element.bind('click', function(event) {
-                unsavedWarningSharedService.removePrompt();
+                ctrl.$setPristine();
             });
         }
     };
@@ -181,10 +192,11 @@ angular.module('mm.unsavedChanges', [])
             // bind to form submit, this makes the typical submit button work
             // in addition to the ability to bind to a seperate button which clears warning
             formElement.bind('submit', function(event) {
-                unsavedWarningSharedService.removePrompt();
+                formCtrl.$setPristine();
             });
 
-            scope.$on('$destroy',function(){
+            // @todo check destroy on clear button too? 
+            scope.$on('$destroy', function() {
                 unsavedWarningSharedService.removeForm(formCtrl);
             });
         }

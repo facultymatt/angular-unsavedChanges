@@ -1,3 +1,6 @@
+// @todo configure grunt default stuff to run on every save so we know that 
+// dist is always up to date and jsLinted
+
 module.exports = function(grunt) {
 
     require('load-grunt-tasks')(grunt, {
@@ -112,8 +115,8 @@ module.exports = function(grunt) {
         },
         'min': {
             'dist': {
-                'src': ['dist/mm.unsavedChanges.js'],
-                'dest': 'dist/mm.unsavedChanges.min.js'
+                'src': ['dist/unsavedChanges.js'],
+                'dest': 'dist/unsavedChanges.min.js'
             }
         },
         jshint: {
@@ -121,8 +124,8 @@ module.exports = function(grunt) {
         },
         strip: {
             main: {
-                src: 'src/mm.unsavedChanges.js',
-                dest: 'dist/mm.unsavedChanges.js'
+                src: 'src/unsavedChanges.js',
+                dest: 'dist/unsavedChanges.js'
             }
         }
         // connect: {

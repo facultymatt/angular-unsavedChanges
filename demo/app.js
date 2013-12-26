@@ -1,5 +1,5 @@
 angular
-    .module('app', ['mm.unsavedChanges', 'ngRoute'])
+    .module('app', ['unsavedChanges', 'ngRoute'])
     .config(['$routeProvider', 'unsavedWarningsConfigProvider',
         function($routeProvider, unsavedWarningsConfigProvider) {
 

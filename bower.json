@@ -6,7 +6,7 @@
     "Matt Miller <matt@facultycreative.com>"
   ],
   "description": "AngularJS directive to warn user of unsaved changes when navigating away from a form.",
-  "main": "mm.unsavedChanges.js",
+  "main": "unsavedChanges.js",
   "keywords": [
     "form",
     "angularjs"
