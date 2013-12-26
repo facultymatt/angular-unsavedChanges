@@ -65,7 +65,7 @@ angular
             var publicInterface = {
                 // log function that accepts any number of arguments
                 // @see http://stackoverflow.com/a/7942355/1738217
-                logIfEnabled: function() {
+                log: function() {
                     if (console.log && logEnabled && arguments.length) {
                         var newarr = [].slice.call(arguments);
                         if (typeof console.log === 'object') {
@@ -146,18 +146,18 @@ angular
     function allFormsClean() {
         areAllFormsClean = true;
         angular.forEach(allForms, function(item, idx) {
-            unsavedWarningsConfig.logIfEnabled('Form : ' + item.$name + ' dirty : ' + item.$dirty);
+            unsavedWarningsConfig.log('Form : ' + item.$name + ' dirty : ' + item.$dirty);
             if (item.$dirty) {
                 areAllFormsClean = false;
             }
-            unsavedWarningsConfig.logIfEnabled("full form", item);
+            unsavedWarningsConfig.log("full form", item);
         });
         return areAllFormsClean; // no dirty forms were found
     }
 
     // pass form controller and adds it to the array
     this.init = function(form) {
-        unsavedWarningsConfig.logIfEnabled("adding form", form);
+        unsavedWarningsConfig.log("adding form", form);
         allForms.push(form);
     };
 
@@ -165,7 +165,7 @@ angular
         var idx = allForms.indexOf(form);
         if (-1 !== idx) {
             allForms.splice(idx, 1);
-            unsavedWarningsConfig.logIfEnabled("Removing form from watch list", form);
+            unsavedWarningsConfig.log("Removing form from watch list", form);
         }
     };
 
@@ -194,18 +194,18 @@ angular
 
     // calling this function later will unbind this, acting as $off()
     removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-        unsavedWarningsConfig.logIfEnabled("user is moving");
+        unsavedWarningsConfig.log("user is moving");
         // @todo this could be written a lot cleaner! 
         if (!allFormsClean()) {
-            unsavedWarningsConfig.logIfEnabled("form is dirty");
+            unsavedWarningsConfig.log("form is dirty");
             if (!confirm(translateIfAble(messages.navigate))) {
-                unsavedWarningsConfig.logIfEnabled("user wants to cancel leaving");
+                unsavedWarningsConfig.log("user wants to cancel leaving");
                 event.preventDefault(); // user clicks cancel, wants to stay on page 
             } else {
-                unsavedWarningsConfig.logIfEnabled("user doesnt care about loosing stuff");
+                unsavedWarningsConfig.log("user doesnt care about loosing stuff");
             }
         } else {
-            unsavedWarningsConfig.logIfEnabled("form is clean");
+            unsavedWarningsConfig.log("form is clean");
         }
 
     });
