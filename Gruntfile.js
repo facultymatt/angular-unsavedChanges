@@ -41,6 +41,11 @@ module.exports = function(grunt) {
                     port: 9999
                 }
             },
+            travisServer: {
+                options: {
+                    port: 4445
+                }
+            },
         },
         // watch tasks
         // Watch specified files for changes and execute tasks on change
@@ -174,13 +179,12 @@ module.exports = function(grunt) {
     ]);
 
     grunt.registerTask('test:travis', [
-        'connect:testserver', // - run concurrent tests
+        'connect:travisServer', // - run concurrent tests
         'protractor:travis' // - single run protractor
     ]);
 
     grunt.registerTask('test:end2end', [
         'selenium:start', // - run concurrent tests
-        'test:unit', // unit test
         'protractor:singlerun' // - single run protractor
     ]);
 
