@@ -180,7 +180,7 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test:travis', [
         'connect:travisServer', // - run concurrent tests
-        'protractor:travis' // - single run protractor
+        'karma:unit' // - single run karma unit
     ]);
 
     grunt.registerTask('test:end2end', [
