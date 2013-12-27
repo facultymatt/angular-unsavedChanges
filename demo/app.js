@@ -35,7 +35,7 @@ angular
         $scope.user = {};
         $scope.demoFormSubmit = function() {
             $scope.message = 'Form Saved';
-            $scope.user = {};
+            //$scope.user = {};
         }
         $scope.clearChanges = function() {
             $scope.user = {};
