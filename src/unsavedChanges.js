@@ -2,6 +2,9 @@
 /*jshint globalstrict: true*/
 /*jshint undef:false */
 
+// @todo NOTE We should investigate changing default to 
+// $routeChangeStart see https://github.com/angular-ui/ui-router/blob/3898270241d4e32c53e63554034d106363205e0e/src/compat.js#L126
+
 angular
     .module('unsavedChanges', [])
 
@@ -142,6 +145,7 @@ angular
 
     // Check all registered forms 
     // if any one is dirty function will return true
+
     function allFormsClean() {
         areAllFormsClean = true;
         angular.forEach(allForms, function(item, idx) {
