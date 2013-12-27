@@ -15,7 +15,6 @@ angular
                 });
 
             // We can turn on logging through this provider method
-            unsavedWarningsConfigProvider.enableLogging(false);
             
             // We uncomment out the below line in order to watch for angular-ui router events
             // rather than standard Angular router events. The default event is $locationChangeStart
@@ -29,7 +28,7 @@ angular
             
             // We use the below line in order to override the default and tell unsavedWarning to NOT
             // use the awesome angular-translate library for some reason
-            unsavedWarningsConfigProvider.setUseTranslateService(false);
+            unsavedWarningsConfigProvider.useTranslateService = false;
         }
     ])
     .controller('demoCtrl', function($scope) {
