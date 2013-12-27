@@ -18,7 +18,7 @@ describe('When single form is dirty', function() {
         // so that our history contains a page to go back to
         browser.get('demo/#/page2');
         element(by.id('page1')).click();
-        element(by.model('user.name')).sendKeys('haha');
+        element(by.id('userName')).sendKeys('haha');
     });
 
     describe('when user clicks a link', function() {
@@ -96,7 +96,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should refresh the page', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('');
             });
         });
 
@@ -107,7 +107,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should stay on page', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
                 cleanUp();
             });
 
@@ -120,7 +120,7 @@ describe('When single form is dirty', function() {
                         browser.navigate().refresh();
                     })
                     it('should navigate to page', function() {
-                        expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+                        expect(element(by.id('userName')).getAttribute('value')).toEqual('');
                     });
                 });
             });
@@ -162,7 +162,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should keep form values', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
                 cleanUp();
             });
 
@@ -207,7 +207,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should keep form values', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
             });
 
         });
@@ -228,7 +228,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should keep form values', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
             });
 
         });
@@ -249,7 +249,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should keep form values', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
             });
 
         });
@@ -270,7 +270,7 @@ describe('When single form is dirty', function() {
             });
 
             it('should keep form values', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('haha');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('haha');
             });
 
         });
@@ -297,7 +297,7 @@ describe('When single form is dirty', function() {
                 browser.navigate().refresh();
             });
             it('should refresh', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('');
             });
         });
 
@@ -331,7 +331,7 @@ describe('When single form is dirty', function() {
                 browser.navigate().refresh();
             });
             it('should refresh', function() {
-                expect(element(by.model('user.name')).getAttribute('value')).toEqual('');
+                expect(element(by.id('userName')).getAttribute('value')).toEqual('');
             });
         });
 
