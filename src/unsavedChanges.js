@@ -247,7 +247,7 @@ angular
             // bind to form submit, this makes the typical submit button work
             // in addition to the ability to bind to a seperate button which clears warning
             formElement.bind('submit', function(event) {
-                if(formCtrl.$valid) {
+                if (formCtrl.$valid) {
                     formCtrl.$setPristine();
                 }
             });
@@ -261,53 +261,60 @@ angular
 });
 
 
+/**
+ * --------------------------------------------
+ * Lazy model adapted from vitalets
+ * @see https://github.com/vitalets/lazy-model/
+ * --------------------------------------------
+ *
+ */
 angular.module('lazyModel', [])
-.directive('lazyModel', ['$parse', '$compile', function($parse, $compile) {
-  return {
-    restrict: 'A',
-    priority: 500,
-    terminal: true,
-    require: '^form',
-    scope: true,
-    compile: function compile(elem, attr) {
-        // getter and setter for original model
-        var ngModelGet = $parse(attr.lazyModel);
-        var ngModelSet = ngModelGet.assign;  
-        // set ng-model to buffer in isolate scope
-        elem.attr('ng-model', 'buffer');
-        // remove lazy-model attribute to exclude recursion
-        elem.removeAttr("lazy-model");
-        return {
-          pre: function(scope, elem) {
-            // initialize buffer value as copy of original model 
-            scope.buffer = ngModelGet(scope.$parent);
-            // compile element with ng-model directive pointing to buffer value   
-            $compile(elem)(scope);
-          },
-          post: function postLink(scope, elem, attr, formCtrl) {
-            // bind form submit to write back final value from buffer
-            var form = elem.parent();
-            while(form[0].tagName !== 'FORM') {
-              form = form.parent();
-            }
-            form.bind('submit', function() {
-              // form valid - save new value
-              if (formCtrl.$valid) {
-                scope.$apply(function() {
-                    ngModelSet(scope.$parent, scope.buffer);
-                });
-              }
-            });
-            form.bind('reset', function(e) {
-              e.preventDefault();
-              scope.$apply(function() {
-                  scope.buffer = ngModelGet(scope.$parent);
-              });
-            });
-          }
-        };  
-     }
-  };
-}]);
-
-
+    .directive('lazyModel', ['$parse', '$compile',
+        function($parse, $compile) {
+            return {
+                restrict: 'A',
+                priority: 500,
+                terminal: true,
+                require: '^form',
+                scope: true,
+                compile: function compile(elem, attr) {
+                    // getter and setter for original model
+                    var ngModelGet = $parse(attr.lazyModel);
+                    var ngModelSet = ngModelGet.assign;
+                    // set ng-model to buffer in isolate scope
+                    elem.attr('ng-model', 'buffer');
+                    // remove lazy-model attribute to exclude recursion
+                    elem.removeAttr("lazy-model");
+                    return {
+                        pre: function(scope, elem) {
+                            // initialize buffer value as copy of original model 
+                            scope.buffer = ngModelGet(scope.$parent);
+                            // compile element with ng-model directive pointing to buffer value   
+                            $compile(elem)(scope);
+                        },
+                        post: function postLink(scope, elem, attr, formCtrl) {
+                            // bind form submit to write back final value from buffer
+                            var form = elem.parent();
+                            while (form[0].tagName !== 'FORM') {
+                                form = form.parent();
+                            }
+                            form.bind('submit', function() {
+                                // form valid - save new value
+                                if (formCtrl.$valid) {
+                                    scope.$apply(function() {
+                                        ngModelSet(scope.$parent, scope.buffer);
+                                    });
+                                }
+                            });
+                            form.bind('reset', function(e) {
+                                e.preventDefault();
+                                scope.$apply(function() {
+                                    scope.buffer = ngModelGet(scope.$parent);
+                                });
+                            });
+                        }
+                    };
+                }
+            };
+        }
+    ]);
