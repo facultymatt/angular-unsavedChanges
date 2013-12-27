@@ -12,7 +12,7 @@ angular
 
     var _this = this;
 
-    // set defaults
+    // defaults
     var logEnabled = false;
     var useTranslateService = true;
     var routeEvent = '$locationChangeStart';
@@ -127,16 +127,15 @@ angular
 .service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
 
     // Controller scopped variables
+    var _this = this;
     var allForms = [];
     var areAllFormsClean = true;
-    var _this = this;
+    var removeFunction = angular.noop;
 
+    // @note only exposed for testing purposes.
     this.allForms = function() {
         return allForms;
     };
-
-    // @todo make noop
-    var removeFunction = function() {};
 
     // save shorthand reference to messages
     var messages = {
@@ -161,46 +160,41 @@ angular
     // adds form controller to registered forms array
     // this array will be checked when user navigates away from page
     this.init = function(form) {
-        if(allForms.length === 0) {
-            setup();
-        }
+        if (allForms.length === 0) setup();
         unsavedWarningsConfig.log("Registering form", form);
         allForms.push(form);
     };
 
     this.removeForm = function(form) {
         var idx = allForms.indexOf(form);
-        if (-1 !== idx) {
-            allForms.splice(idx, 1);
-            unsavedWarningsConfig.log("Removing form from watch list", form);
-        }
-        if(allForms.length === 0) {
-            unsavedWarningsConfig.log('No more forms, tearing down');
-            removeFunction();
-            window.onbeforeunload = null;
-        }
+
+        // this form is not present array
+        // @todo needs test coverage 
+        if (idx === -1) return;
+
+        allForms.splice(idx, 1);
+        unsavedWarningsConfig.log("Removing form from watch list", form);
+
+        if (allForms.length === 0) tearDown();
     };
 
-    // this.removePrompt = function() {
-    //     allForms = []; // reset forms array
-    //     removeFunction();
-    //     window.onbeforeunload = null;
-    // };
+    function tearDown() {
+        unsavedWarningsConfig.log('No more forms, tearing down');
+        removeFunction();
+        window.onbeforeunload = null;
+    };
 
     // Function called when user tries to close the window
     this.confirmExit = function() {
         // @todo this could be written a lot cleaner! 
-        if (!allFormsClean()) {
-            return messages.reload;
-        } else {
-            removeFunction();
-            window.onbeforeunload = null;
-        }
+        if (!allFormsClean()) return messages.reload;
+        tearDown();
     };
 
     // bind to window close
     // @todo investigate new method for listening as discovered in previous tests
-    var setup = function() {
+
+    function setup() {
         unsavedWarningsConfig.log('Setting up');
 
         window.onbeforeunload = _this.confirmExit;
