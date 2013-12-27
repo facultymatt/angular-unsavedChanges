@@ -137,7 +137,7 @@ angular
     // save shorthand reference to messages
     var messages = {
         navigate: unsavedWarningsConfig.navigateMessage,
-        reload: unsavedWarningsConfig.getReloadMessage
+        reload: unsavedWarningsConfig.reloadMessage
     };
 
     // Check all registered forms 
