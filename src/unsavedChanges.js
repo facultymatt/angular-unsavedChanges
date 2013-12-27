@@ -129,6 +129,7 @@ angular
     // Controller scopped variables
     var allForms = [];
     var areAllFormsClean = true;
+    var _this = this;
 
     this.allForms = function() {
         return allForms;
@@ -160,6 +161,9 @@ angular
     // adds form controller to registered forms array
     // this array will be checked when user navigates away from page
     this.init = function(form) {
+        if(allForms.length === 0) {
+            setup();
+        }
         unsavedWarningsConfig.log("Registering form", form);
         allForms.push(form);
     };
@@ -170,18 +174,18 @@ angular
             allForms.splice(idx, 1);
             unsavedWarningsConfig.log("Removing form from watch list", form);
         }
-        // if(allForms.length === 0) {
-        //     console.log('Removing stuff');
-        //     removeFunction();
-        //     window.onbeforeunload = null;
-        // }
+        if(allForms.length === 0) {
+            unsavedWarningsConfig.log('No more forms, tearing down');
+            removeFunction();
+            window.onbeforeunload = null;
+        }
     };
 
-    this.removePrompt = function() {
-        allForms = []; // reset forms array
-        removeFunction();
-        window.onbeforeunload = null;
-    };
+    // this.removePrompt = function() {
+    //     allForms = []; // reset forms array
+    //     removeFunction();
+    //     window.onbeforeunload = null;
+    // };
 
     // Function called when user tries to close the window
     this.confirmExit = function() {
@@ -196,27 +200,31 @@ angular
 
     // bind to window close
     // @todo investigate new method for listening as discovered in previous tests
-    window.onbeforeunload = this.confirmExit;
+    var setup = function() {
+        unsavedWarningsConfig.log('Setting up');
 
-    var eventToWatchFor = unsavedWarningsConfig.routeEvent;
+        window.onbeforeunload = _this.confirmExit;
 
-    // calling this function later will unbind this, acting as $off()
-    removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-        unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
-        // @todo this could be written a lot cleaner! 
-        if (!allFormsClean()) {
-            unsavedWarningsConfig.log("a form is dirty");
-            if (!confirm(messages.navigate)) {
-                unsavedWarningsConfig.log("user wants to cancel leaving");
-                event.preventDefault(); // user clicks cancel, wants to stay on page 
+        var eventToWatchFor = unsavedWarningsConfig.routeEvent;
+
+        // calling this function later will unbind this, acting as $off()
+        removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
+            unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
+            // @todo this could be written a lot cleaner! 
+            if (!allFormsClean()) {
+                unsavedWarningsConfig.log("a form is dirty");
+                if (!confirm(messages.navigate)) {
+                    unsavedWarningsConfig.log("user wants to cancel leaving");
+                    event.preventDefault(); // user clicks cancel, wants to stay on page 
+                } else {
+                    unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                }
             } else {
-                unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                unsavedWarningsConfig.log("all forms are clean");
             }
-        } else {
-            unsavedWarningsConfig.log("all forms are clean");
-        }
 
-    });
+        });
+    }
 
 })
 
