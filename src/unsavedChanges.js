@@ -247,7 +247,9 @@ angular
             // bind to form submit, this makes the typical submit button work
             // in addition to the ability to bind to a seperate button which clears warning
             formElement.bind('submit', function(event) {
-                formCtrl.$setPristine();
+                if(formCtrl.$valid) {
+                    formCtrl.$setPristine();
+                }
             });
 
             // @todo check destroy on clear button too? 
