@@ -43,8 +43,41 @@ Add to forms you want to register with directive.
 `unsaved-warning-clear` 
 Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. 
 
-### Configuration 
-A number of options can be configured. See the unit test for examples of how to implement. 
+### Provider Configuration 
+A number of options can be configured. The module uses the `Object.defineProperty` pattern. This avoids the need for custom getters and setters and allows us to treat configuration as pure JS objects. 
+
+#### useTranslateService
+Defaults to `true`. Will use translate service if available. It's safe to leave this set to `true`, even when not using the translate service, because the module still checks that the service exists. 
+
+```
+unsavedWarningsConfigProvider.useTranslateService = true;
+```
+
+#### logEnabled
+Defaults to `false`. Uses the services internal logging method for debugging.  
+
+```
+unsavedWarningsConfigProvider.logEnabled = true;
+```
+
+#### routeEvent
+Defaults to `$locationChangeStart`. When using with ui Router, you might want to change to `$stateChangeStart`.
+
+```
+unsavedWarningsConfigProvider.routeEvent = '$stateChangeStart';
+```
+
+#### navigateMessage
+Set custom message displayed when user navigates. If using translate this will be the key to translate. 
+```
+unsavedWarningsConfigProvider.navigateMessage = "Custom Navigate Message";
+```
+
+#### reloadMessage
+Set custom message displayed when user refreshes the page. If using translate this will be the key to translate. 
+```
+unsavedWarningsConfigProvider.reloadMessage = "Custom Reload Message";
+```
 
 
 ## Gotchas / Known Bugs
