@@ -214,7 +214,6 @@ describe('UnsavedChanges', function() {
 
             });
 
-
         });
 
         describe('custom navigate message', function() {

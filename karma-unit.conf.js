@@ -21,7 +21,7 @@ module.exports = function(config) {
       //'demo/bower_components/angular-scenario/angular-scenario.js',
       //'node_modules/karma-ng-scenario/lib/adapter.js',
       'src/unsavedChanges.js',
-      'spec/**/*.spec.js'
+      'test/unit/**/*.spec.js'
     ],
     // preprocessors: {
     //   'app/scripts/components/*/views/*.html': ['ng-html2js']
