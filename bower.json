@@ -25,7 +25,9 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.2.5",
+    "angular": "~1.2.5"
+  },
+  "devDependencies": {
     "angular-route": "~1.2.2",
     "angular-mocks": "~1.2.2",
     "angular-scenario": "~1.2.2",

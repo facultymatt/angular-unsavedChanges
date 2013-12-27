@@ -182,7 +182,7 @@ angular
         unsavedWarningsConfig.log('No more forms, tearing down');
         removeFunction();
         window.onbeforeunload = null;
-    };
+    }
 
     // Function called when user tries to close the window
     this.confirmExit = function() {

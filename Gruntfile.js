@@ -50,57 +50,15 @@ module.exports = function(grunt) {
         // watch tasks
         // Watch specified files for changes and execute tasks on change
         watch: {
-            coffee: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.coffee'],
-                tasks: ['coffee:dist']
-            },
-            coffeeTest: {
-                files: ['<%= yeoman.test %>/spec/{,*/}*.coffee'],
-                tasks: ['coffee:test']
-            },
-            styles: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-                tasks: ['copy:styles', 'autoprefixer']
-            },
-            lessDev: {
-                files: ['<%= yeoman.app %>/{,*/}*.less'],
-                tasks: ['less:dev']
-            },
             livereload: {
                 options: {
-                    livereload: '<%= connect.options.livereload %>'
+                    livereload: true
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
-                    '.tmp/styles/{,*/}*.css',
-                    '<%= yeoman.app %>/css/{,*/}*.css',
-                    '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
-                ]
-            },
-        },
-        shell: {
-            options: {
-                stdout: true
-            },
-            selenium: {
-                command: './selenium/start',
-                options: {
-                    stdout: true,
-                    async: true
-                }
-            },
-            seleniumStop: {
-                command: 'curl -s http://localhost:4444/selenium-server/driver/?cmd=shutDownSeleniumServer'
-            },
-            protractorInstall: {
-                command: 'node ./node_modules/protractor/bin/install_selenium_standalone'
-            },
-            npmInstall: {
-                command: 'npm install'
-            },
-            bowerInstall: {
-                command: 'node ./node_modules/bower/bin/bower install'
+                    'src/*.js',
+                    'demo/*.js'
+                ],
+                tasks: ['jshint']
             },
         },
         karma: {
@@ -133,20 +91,17 @@ module.exports = function(grunt) {
                 dest: 'dist/unsavedChanges.js'
             }
         }
-        // connect: {
-        //     server: {
-        //         options: {
-        //             port: 9001,
-        //             open: true,
-        //             keepalive: true
-        //         }
-        //     }
-        // }
 
     });
 
     grunt.registerTask('test', [
-        'test:unit', // - run unit tests
+        'test:unit'
+    ]);
+
+    grunt.registerTask('server', [
+        'jshint',
+        'watch:livereload',
+        'connect:server'
     ]);
 
     grunt.registerTask('test:unit', [
@@ -181,35 +136,6 @@ module.exports = function(grunt) {
     grunt.registerTask('test:travis', [
         'connect:travisServer', // - run concurrent tests
         'karma:unit' // - single run karma unit
-    ]);
-
-    grunt.registerTask('test:end2end', [
-        'selenium:start', // - run concurrent tests
-        'protractor:singlerun' // - single run protractor
-    ]);
-
-    grunt.registerTask('selenium', [
-        'selenium:start' // - starts selenium server in watch mode
-    ]);
-
-    grunt.registerTask('selenium:start', [
-        'shell:selenium' // - starts selenium server in watch mode
-    ]);
-
-    grunt.registerTask('selenium:stop', [
-        'shell:seleniumStop' // - stops server
-    ]);
-
-    // initial install
-    grunt.registerTask('install', [
-        'update', // - Runs grunt update task, which runs `bower` and `npm` install 
-        'shell:protractorInstall' // - install protractor, seleium, et el.
-    ]);
-
-    // update
-    grunt.registerTask('update', [
-        'shell:npmInstall',
-        'shell:bowerInstall'
     ]);
 
 };
