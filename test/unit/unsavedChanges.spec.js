@@ -60,9 +60,9 @@ describe('UnsavedChanges', function() {
 
         formTemplate = angular.element('<div>' +
             '<form name="testForm" unsaved-warning-form>' +
-            '<input name="test" type="text" ng-model="test"/>' +
+            '<input id="test" required name="test" type="text" lazy-model="test"/>' +
             '<button id="submit" type="submit"></button>' +
-            '<button name="clear" id="clear" type="button" unsaved-warning-clear>Clear</button>' +
+            '<button name="clear" id="clear" type="reset" unsaved-warning-clear>Clear</button>' +
             '</form>' +
             '</div>');
 
@@ -121,6 +121,8 @@ describe('UnsavedChanges', function() {
 
         $location.path('/page1');
         $rootScope.$digest();
+
+        controllerScope.test = 'default value';
 
         // @note logs will not occur if we are not calling through
         spyOn(console, 'log').andCallThrough();
@@ -268,7 +270,7 @@ describe('UnsavedChanges', function() {
         });
 
         describe('use translate service', function() {
-            
+
             beforeEach(function() {
                 unsavedWarningsConfigProviderCache.navigateMessage = 'TEST';
             })
@@ -286,4 +288,75 @@ describe('UnsavedChanges', function() {
 
     });
 
+    describe('Lazy Model', function() {
+
+        var submit, input, reset;
+
+        beforeEach(function() {
+            submit = formTemplate.find('#submit');
+            input = formTemplate.find('#test');
+            reset = formTemplate.find('#clear');
+        })
+
+        it('adds ng-model with isolate scope variable to registered elements', function() {
+            expect(input.attr('ng-model')).toEqual('buffer');
+        });
+
+        it('resets to original model value on form reset', function() {
+            controllerScope.testForm.test.$setViewValue('cool beans');
+            expect(controllerScope.testForm.test.$modelValue).toEqual('cool beans');
+            reset.click();
+            expect(controllerScope.testForm.test.$modelValue).toEqual('default value');
+        });
+
+        describe('form is invalid', function() {
+
+            beforeEach(function() {
+                controllerScope.testForm.test.$setViewValue('');
+                controllerScope.$digest();
+            });
+
+            describe('on form submit', function() {
+
+                beforeEach(function() {
+                    submit.click();
+                    controllerScope.$digest();
+                });
+
+                it('updates model', function() {
+                    expect(controllerScope.test).toEqual('default value');
+                });
+
+            });
+
+        });
+
+        describe('form is valid', function() {
+            
+            beforeEach(function() {
+                controllerScope.testForm.test.$setViewValue('cool beans');
+            });
+
+            describe('on form submit', function() {
+
+                beforeEach(function() {
+                    submit.click();
+                    controllerScope.$digest();
+                });
+
+                it('does not update model', function() {
+                    expect(controllerScope.test).toEqual('cool beans');
+                });
+
+            });
+
+        });
+
+    });
+
 });
+
+
+
+
+///
