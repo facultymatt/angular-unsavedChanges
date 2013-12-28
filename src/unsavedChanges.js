@@ -5,8 +5,7 @@
 // @todo NOTE We should investigate changing default to 
 // $routeChangeStart see https://github.com/angular-ui/ui-router/blob/3898270241d4e32c53e63554034d106363205e0e/src/compat.js#L126
 
-angular
-    .module('unsavedChanges', ['lazyModel'])
+angular.module('unsavedChanges', ['lazyModel'])
 
 .provider('unsavedWarningsConfig', function() {
 
@@ -124,141 +123,147 @@ angular
     ];
 })
 
-.service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
+.service('unsavedWarningSharedService', ['$rootScope', 'unsavedWarningsConfig', '$injector',
+    function($rootScope, unsavedWarningsConfig, $injector) {
 
-    // Controller scopped variables
-    var _this = this;
-    var allForms = [];
-    var areAllFormsClean = true;
-    var removeFunction = angular.noop;
+        // Controller scopped variables
+        var _this = this;
+        var allForms = [];
+        var areAllFormsClean = true;
+        var removeFunction = angular.noop;
 
-    // @note only exposed for testing purposes.
-    this.allForms = function() {
-        return allForms;
-    };
+        // @note only exposed for testing purposes.
+        this.allForms = function() {
+            return allForms;
+        };
 
-    // save shorthand reference to messages
-    var messages = {
-        navigate: unsavedWarningsConfig.navigateMessage,
-        reload: unsavedWarningsConfig.reloadMessage
-    };
+        // save shorthand reference to messages
+        var messages = {
+            navigate: unsavedWarningsConfig.navigateMessage,
+            reload: unsavedWarningsConfig.reloadMessage
+        };
 
-    // Check all registered forms 
-    // if any one is dirty function will return true
+        // Check all registered forms 
+        // if any one is dirty function will return true
 
-    function allFormsClean() {
-        areAllFormsClean = true;
-        angular.forEach(allForms, function(item, idx) {
-            unsavedWarningsConfig.log('Form : ' + item.$name + ' dirty : ' + item.$dirty);
-            if (item.$dirty) {
-                areAllFormsClean = false;
-            }
-        });
-        return areAllFormsClean; // no dirty forms were found
-    }
+        function allFormsClean() {
+            areAllFormsClean = true;
+            angular.forEach(allForms, function(item, idx) {
+                unsavedWarningsConfig.log('Form : ' + item.$name + ' dirty : ' + item.$dirty);
+                if (item.$dirty) {
+                    areAllFormsClean = false;
+                }
+            });
+            return areAllFormsClean; // no dirty forms were found
+        }
 
-    // adds form controller to registered forms array
-    // this array will be checked when user navigates away from page
-    this.init = function(form) {
-        if (allForms.length === 0) setup();
-        unsavedWarningsConfig.log("Registering form", form);
-        allForms.push(form);
-    };
+        // adds form controller to registered forms array
+        // this array will be checked when user navigates away from page
+        this.init = function(form) {
+            if (allForms.length === 0) setup();
+            unsavedWarningsConfig.log("Registering form", form);
+            allForms.push(form);
+        };
 
-    this.removeForm = function(form) {
-        var idx = allForms.indexOf(form);
+        this.removeForm = function(form) {
+            var idx = allForms.indexOf(form);
 
-        // this form is not present array
-        // @todo needs test coverage 
-        if (idx === -1) return;
+            // this form is not present array
+            // @todo needs test coverage 
+            if (idx === -1) return;
 
-        allForms.splice(idx, 1);
-        unsavedWarningsConfig.log("Removing form from watch list", form);
+            allForms.splice(idx, 1);
+            unsavedWarningsConfig.log("Removing form from watch list", form);
 
-        if (allForms.length === 0) tearDown();
-    };
+            if (allForms.length === 0) tearDown();
+        };
 
-    function tearDown() {
-        unsavedWarningsConfig.log('No more forms, tearing down');
-        removeFunction();
-        window.onbeforeunload = null;
-    }
+        function tearDown() {
+            unsavedWarningsConfig.log('No more forms, tearing down');
+            removeFunction();
+            window.onbeforeunload = null;
+        }
 
-    // Function called when user tries to close the window
-    this.confirmExit = function() {
-        // @todo this could be written a lot cleaner! 
-        if (!allFormsClean()) return messages.reload;
-        tearDown();
-    };
-
-    // bind to window close
-    // @todo investigate new method for listening as discovered in previous tests
-
-    function setup() {
-        unsavedWarningsConfig.log('Setting up');
-
-        window.onbeforeunload = _this.confirmExit;
-
-        var eventToWatchFor = unsavedWarningsConfig.routeEvent;
-
-        // calling this function later will unbind this, acting as $off()
-        removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-            unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
+        // Function called when user tries to close the window
+        this.confirmExit = function() {
             // @todo this could be written a lot cleaner! 
-            if (!allFormsClean()) {
-                unsavedWarningsConfig.log("a form is dirty");
-                if (!confirm(messages.navigate)) {
-                    unsavedWarningsConfig.log("user wants to cancel leaving");
-                    event.preventDefault(); // user clicks cancel, wants to stay on page 
+            if (!allFormsClean()) return messages.reload;
+            tearDown();
+        };
+
+        // bind to window close
+        // @todo investigate new method for listening as discovered in previous tests
+
+        function setup() {
+            unsavedWarningsConfig.log('Setting up');
+
+            window.onbeforeunload = _this.confirmExit;
+
+            var eventToWatchFor = unsavedWarningsConfig.routeEvent;
+
+            // calling this function later will unbind this, acting as $off()
+            removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
+                unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
+                // @todo this could be written a lot cleaner! 
+                if (!allFormsClean()) {
+                    unsavedWarningsConfig.log("a form is dirty");
+                    if (!confirm(messages.navigate)) {
+                        unsavedWarningsConfig.log("user wants to cancel leaving");
+                        event.preventDefault(); // user clicks cancel, wants to stay on page 
+                    } else {
+                        unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                    }
                 } else {
-                    unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                    unsavedWarningsConfig.log("all forms are clean");
                 }
-            } else {
-                unsavedWarningsConfig.log("all forms are clean");
-            }
 
-        });
+            });
+        }
+
     }
+])
 
-})
-
-.directive('unsavedWarningClear', function(unsavedWarningSharedService) {
-    return {
-        scope: true,
-        require: '^form',
-        priority: 3000,
-        link: function(scope, element, attrs, formCtrl) {
-            element.bind('click', function(event) {
-                formCtrl.$setPristine();
-            });
-
-        }
-    };
-})
-
-.directive('unsavedWarningForm', function(unsavedWarningSharedService) {
-    return {
-        require: 'form',
-        link: function(scope, formElement, attrs, formCtrl) {
-
-            // register this form
-            unsavedWarningSharedService.init(formCtrl);
-
-            // bind to form submit, this makes the typical submit button work
-            // in addition to the ability to bind to a seperate button which clears warning
-            formElement.bind('submit', function(event) {
-                if (formCtrl.$valid) {
+.directive('unsavedWarningClear', ['unsavedWarningSharedService',
+    function(unsavedWarningSharedService) {
+        return {
+            scope: true,
+            require: '^form',
+            priority: 3000,
+            link: function(scope, element, attrs, formCtrl) {
+                element.bind('click', function(event) {
                     formCtrl.$setPristine();
-                }
-            });
+                });
 
-            // @todo check destroy on clear button too? 
-            scope.$on('$destroy', function() {
-                unsavedWarningSharedService.removeForm(formCtrl);
-            });
-        }
-    };
-});
+            }
+        };
+    }
+])
+
+.directive('unsavedWarningForm', ['unsavedWarningSharedService',
+    function(unsavedWarningSharedService) {
+        return {
+            require: 'form',
+            link: function(scope, formElement, attrs, formCtrl) {
+
+                // register this form
+                unsavedWarningSharedService.init(formCtrl);
+
+                // bind to form submit, this makes the typical submit button work
+                // in addition to the ability to bind to a seperate button which clears warning
+                formElement.bind('submit', function(event) {
+                    if (formCtrl.$valid) {
+                        formCtrl.$setPristine();
+                    }
+                });
+
+                // @todo check destroy on clear button too? 
+                scope.$on('$destroy', function() {
+                    unsavedWarningSharedService.removeForm(formCtrl);
+                });
+            }
+        };
+    }
+]);
 
 
 /**
@@ -269,52 +274,53 @@ angular
  *
  */
 angular.module('lazyModel', [])
-    .directive('lazyModel', ['$parse', '$compile',
-        function($parse, $compile) {
-            return {
-                restrict: 'A',
-                priority: 500,
-                terminal: true,
-                require: '^form',
-                scope: true,
-                compile: function compile(elem, attr) {
-                    // getter and setter for original model
-                    var ngModelGet = $parse(attr.lazyModel);
-                    var ngModelSet = ngModelGet.assign;
-                    // set ng-model to buffer in isolate scope
-                    elem.attr('ng-model', 'buffer');
-                    // remove lazy-model attribute to exclude recursion
-                    elem.removeAttr("lazy-model");
-                    return {
-                        pre: function(scope, elem) {
-                            // initialize buffer value as copy of original model 
-                            scope.buffer = ngModelGet(scope.$parent);
-                            // compile element with ng-model directive pointing to buffer value   
-                            $compile(elem)(scope);
-                        },
-                        post: function postLink(scope, elem, attr, formCtrl) {
-                            // bind form submit to write back final value from buffer
-                            var form = elem.parent();
-                            while (form[0].tagName !== 'FORM') {
-                                form = form.parent();
-                            }
-                            form.bind('submit', function() {
-                                // form valid - save new value
-                                if (formCtrl.$valid) {
-                                    scope.$apply(function() {
-                                        ngModelSet(scope.$parent, scope.buffer);
-                                    });
-                                }
-                            });
-                            form.bind('reset', function(e) {
-                                e.preventDefault();
-                                scope.$apply(function() {
-                                    scope.buffer = ngModelGet(scope.$parent);
-                                });
-                            });
+
+.directive('lazyModel', ['$parse', '$compile',
+    function($parse, $compile) {
+        return {
+            restrict: 'A',
+            priority: 500,
+            terminal: true,
+            require: '^form',
+            scope: true,
+            compile: function compile(elem, attr) {
+                // getter and setter for original model
+                var ngModelGet = $parse(attr.lazyModel);
+                var ngModelSet = ngModelGet.assign;
+                // set ng-model to buffer in isolate scope
+                elem.attr('ng-model', 'buffer');
+                // remove lazy-model attribute to exclude recursion
+                elem.removeAttr("lazy-model");
+                return {
+                    pre: function(scope, elem) {
+                        // initialize buffer value as copy of original model 
+                        scope.buffer = ngModelGet(scope.$parent);
+                        // compile element with ng-model directive pointing to buffer value   
+                        $compile(elem)(scope);
+                    },
+                    post: function postLink(scope, elem, attr, formCtrl) {
+                        // bind form submit to write back final value from buffer
+                        var form = elem.parent();
+                        while (form[0].tagName !== 'FORM') {
+                            form = form.parent();
                         }
-                    };
-                }
-            };
-        }
-    ]);
+                        form.bind('submit', function() {
+                            // form valid - save new value
+                            if (formCtrl.$valid) {
+                                scope.$apply(function() {
+                                    ngModelSet(scope.$parent, scope.buffer);
+                                });
+                            }
+                        });
+                        form.bind('reset', function(e) {
+                            e.preventDefault();
+                            scope.$apply(function() {
+                                scope.buffer = ngModelGet(scope.$parent);
+                            });
+                        });
+                    }
+                };
+            }
+        };
+    }
+]);
