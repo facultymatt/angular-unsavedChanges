@@ -92,6 +92,8 @@ To try the demo run `npm install` && `bower install` && `grunt connect`. The bro
 
 ## Test
 
+Note you need to manually change the paths in `index.html` and `karam-unit.conf` to point to the `dist` version for final testing. Make sure to run `$ grunt` first. 
+
 __End 2 End Testing__
 Because of the alert / event driven nature of this module it made the most sense to rely on e2e tests. (also its hard to interact with alerts via unit tests).
 

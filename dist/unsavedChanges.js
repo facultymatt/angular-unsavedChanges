@@ -1,204 +1,326 @@
-angular.module('unsavedChanges', [])
+'use strict';
+/*jshint globalstrict: true*/
+/*jshint undef:false */
+
+// @todo NOTE We should investigate changing default to 
+// $routeChangeStart see https://github.com/angular-ui/ui-router/blob/3898270241d4e32c53e63554034d106363205e0e/src/compat.js#L126
+
+angular.module('unsavedChanges', ['lazyModel'])
 
 .provider('unsavedWarningsConfig', function() {
 
+    var _this = this;
+
+    // defaults
     var logEnabled = false;
-
     var useTranslateService = true;
-
     var routeEvent = '$locationChangeStart';
-
     var navigateMessage = 'You will lose unsaved changes if you leave this page';
-
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
 
-    this.enableLogging = function(enableLogging) {
-        logEnabled = enableLogging;
-    };
+    Object.defineProperty(_this, 'navigateMessage', {
+        get: function() {
+            return navigateMessage;
+        },
+        set: function(value) {
+            navigateMessage = value;
+        }
+    });
 
-    this.setRouteEventToWatchFor = function(watchRouteEvent) {
-        routeEvent = watchRouteEvent;
-    };
+    Object.defineProperty(_this, 'reloadMessage', {
+        get: function() {
+            return reloadMessage;
+        },
+        set: function(value) {
+            reloadMessage = value;
+        }
+    });
 
-    this.setNavigateMessage = function(newNavigateMessage) {
-        navigateMessage = newNavigateMessage;
-    };
+    Object.defineProperty(_this, 'useTranslateService', {
+        get: function() {
+            return useTranslateService;
+        },
+        set: function(value) {
+            useTranslateService = !! (value);
+        }
+    });
 
-    this.setReloadMessage = function(newReloadMessage) {
-        reloadMessage = newReloadMessage;
-    };
+    Object.defineProperty(_this, 'routeEvent', {
+        get: function() {
+            return routeEvent;
+        },
+        set: function(value) {
+            routeEvent = value;
+        }
+    });
+    Object.defineProperty(_this, 'logEnabled', {
+        get: function() {
+            return logEnabled;
+        },
+        set: function(value) {
+            logEnabled = !! (value);
+        }
+    });
 
-    this.setUseTranslateService = function(configUseTranslateService) {
-        useTranslateService = configUseTranslateService;
-    };
+    this.$get = ['$injector',
+        function($injector) {
 
-    this.$get = ['$injector', function($injector) {
-        return {
-            isLoggingEnabled: function() {
-                return logEnabled;
-            },
-            logIfEnabled: function() {
-                if (logEnabled) {
-                    if (arguments.length === 2) {
-                        0;
-                    }
-                    if (arguments.length === 1) {
-                        0;
-                    }
+            function translateIfAble(message) {
+                if ($injector.has('$translate') && useTranslateService) {
+                    return $injector.get('$translate')(message);
+                } else {
+                    return false;
                 }
-            },
-            getRouteEvent: function() {
-                return routeEvent;
-            },
-            getNavigateMessage: function() {
-                return navigateMessage;
-            },
-            getNavigateMessageTranslated: function() {
-                if (useTranslateService && $injector.has('$translate')) {
-                    return $injector.get('$translate')(navigateMessage);
-                }
-                return navigateMessage;
-            },
-            getReloadMessage: function() {
-                return reloadMessage;
-            },
-            getUseTranslateService: function() {
-                return useTranslateService;
             }
-        };
-    }];
+
+            var publicInterface = {
+                // log function that accepts any number of arguments
+                // @see http://stackoverflow.com/a/7942355/1738217
+                log: function() {
+                    if (console.log && logEnabled && arguments.length) {
+                        var newarr = [].slice.call(arguments);
+                        if (typeof console.log === 'object') {
+                            log.apply.call(console.log, console, newarr);
+                        } else {
+                            console.log.apply(console, newarr);
+                        }
+                    }
+                }
+            };
+
+            Object.defineProperty(publicInterface, 'useTranslateService', {
+                get: function() {
+                    return useTranslateService;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'reloadMessage', {
+                get: function() {
+                    return translateIfAble(reloadMessage) || reloadMessage;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'navigateMessage', {
+                get: function() {
+                    return translateIfAble(navigateMessage) || navigateMessage;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'routeEvent', {
+                get: function() {
+                    return routeEvent;
+                }
+            });
+
+            Object.defineProperty(publicInterface, 'logEnabled', {
+                get: function() {
+                    return logEnabled;
+                }
+            });
+
+            return publicInterface;
+        }
+    ];
 })
 
-.service('unsavedWarningSharedService', function($rootScope, unsavedWarningsConfig, $injector) {
+.service('unsavedWarningSharedService', ['$rootScope', 'unsavedWarningsConfig', '$injector',
+    function($rootScope, unsavedWarningsConfig, $injector) {
 
-    // Controller scopped variables
-    var allForms = [];
-    var areAllFormsClean = true;
+        // Controller scopped variables
+        var _this = this;
+        var allForms = [];
+        var areAllFormsClean = true;
+        var removeFunction = angular.noop;
 
-    // @todo make noop
-    var removeFunction = function() {};
+        // @note only exposed for testing purposes.
+        this.allForms = function() {
+            return allForms;
+        };
 
-    // messages. Change here is you need 
-    var messages = {
-        navigate: unsavedWarningsConfig.getNavigateMessage(),
-        reload: unsavedWarningsConfig.getReloadMessage()
-    };
+        // save shorthand reference to messages
+        var messages = {
+            navigate: unsavedWarningsConfig.navigateMessage,
+            reload: unsavedWarningsConfig.reloadMessage
+        };
 
-    function translateIfAble(message) {
-        if ($injector.has('$translate') && unsavedWarningsConfig.getUseTranslateService()) {
-            return $injector.get('$translate')(message);
-        } else {
-            return message;
+        // Check all registered forms 
+        // if any one is dirty function will return true
+
+        function allFormsClean() {
+            areAllFormsClean = true;
+            angular.forEach(allForms, function(item, idx) {
+                unsavedWarningsConfig.log('Form : ' + item.$name + ' dirty : ' + item.$dirty);
+                if (item.$dirty) {
+                    areAllFormsClean = false;
+                }
+            });
+            return areAllFormsClean; // no dirty forms were found
         }
-    }
 
-    // Checks all forms, if any one is dirty will return true
+        // adds form controller to registered forms array
+        // this array will be checked when user navigates away from page
+        this.init = function(form) {
+            if (allForms.length === 0) setup();
+            unsavedWarningsConfig.log("Registering form", form);
+            allForms.push(form);
+        };
 
-    function allFormsClean() {
-        areAllFormsClean = true;
-        angular.forEach(allForms, function(item, idx) {
-            unsavedWarningsConfig.logIfEnabled('Form : ' + item.$name + ' dirty : ' + item.$dirty);
-            if (item.$dirty) {
-                areAllFormsClean = false;
-            }
-            unsavedWarningsConfig.logIfEnabled("full form", item);
-        });
-        return areAllFormsClean; // no dirty forms were found
-    }
+        this.removeForm = function(form) {
+            var idx = allForms.indexOf(form);
 
-    // pass form controller and adds it to the array
-    this.init = function(form) {
-        unsavedWarningsConfig.logIfEnabled("adding form", form);
-        allForms.push(form);
-    };
+            // this form is not present array
+            // @todo needs test coverage 
+            if (idx === -1) return;
 
-    this.removeForm = function(form) {
-        var idx = allForms.indexOf(form);
-        if (-1 !== idx) {
             allForms.splice(idx, 1);
-            unsavedWarningsConfig.logIfEnabled("Removing form from watch list", form);
-        }
-    };
+            unsavedWarningsConfig.log("Removing form from watch list", form);
 
-    this.removePrompt = function() {
-        allForms = []; // reset forms array
-        removeFunction();
-        window.onbeforeunload = null;
-    };
+            if (allForms.length === 0) tearDown();
+        };
 
-    // Function called when user tries to close the window
-    this.confirmExit = function() {
-        // @todo this could be written a lot cleaner! 
-        if (!allFormsClean()) {
-            return translateIfAble(messages.reload);
-        } else {
+        function tearDown() {
+            unsavedWarningsConfig.log('No more forms, tearing down');
             removeFunction();
             window.onbeforeunload = null;
         }
-    };
 
-    // bind to window close
-    // @todo investigate new method for listening as discovered in previous tests
-    window.onbeforeunload = this.confirmExit;
+        // Function called when user tries to close the window
+        this.confirmExit = function() {
+            // @todo this could be written a lot cleaner! 
+            if (!allFormsClean()) return messages.reload;
+            tearDown();
+        };
 
-    var eventToWatchFor = unsavedWarningsConfig.getRouteEvent();
+        // bind to window close
+        // @todo investigate new method for listening as discovered in previous tests
 
-    // calling this function later will unbind this, acting as $off()
-    removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-        unsavedWarningsConfig.logIfEnabled("user is moving");
-        // @todo this could be written a lot cleaner! 
-        if (!allFormsClean()) {
-            unsavedWarningsConfig.logIfEnabled("form is dirty");
-            if (!confirm(translateIfAble(messages.navigate))) {
-                unsavedWarningsConfig.logIfEnabled("user wants to cancel leaving");
-                event.preventDefault(); // user clicks cancel, wants to stay on page 
-            } else {
-                unsavedWarningsConfig.logIfEnabled("user doesnt care about loosing stuff");
+        function setup() {
+            unsavedWarningsConfig.log('Setting up');
+
+            window.onbeforeunload = _this.confirmExit;
+
+            var eventToWatchFor = unsavedWarningsConfig.routeEvent;
+
+            // calling this function later will unbind this, acting as $off()
+            removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
+                unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
+                // @todo this could be written a lot cleaner! 
+                if (!allFormsClean()) {
+                    unsavedWarningsConfig.log("a form is dirty");
+                    if (!confirm(messages.navigate)) {
+                        unsavedWarningsConfig.log("user wants to cancel leaving");
+                        event.preventDefault(); // user clicks cancel, wants to stay on page 
+                    } else {
+                        unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                    }
+                } else {
+                    unsavedWarningsConfig.log("all forms are clean");
+                }
+
+            });
+        }
+
+    }
+])
+
+.directive('unsavedWarningClear', ['unsavedWarningSharedService',
+    function(unsavedWarningSharedService) {
+        return {
+            scope: true,
+            require: '^form',
+            priority: 3000,
+            link: function(scope, element, attrs, formCtrl) {
+                element.bind('click', function(event) {
+                    formCtrl.$setPristine();
+                });
+
             }
-        } else {
-            unsavedWarningsConfig.logIfEnabled("form is clean");
-        }
+        };
+    }
+])
 
-    });
+.directive('unsavedWarningForm', ['unsavedWarningSharedService',
+    function(unsavedWarningSharedService) {
+        return {
+            require: 'form',
+            link: function(scope, formElement, attrs, formCtrl) {
 
-})
+                // register this form
+                unsavedWarningSharedService.init(formCtrl);
 
-.directive('unsavedWarningClear', function(unsavedWarningSharedService) {
-    return {
-        scope: true,
-        require: '^form',
-        priority: 3000,
-        link: function(scope, element, attrs, ctrl) {
+                // bind to form submit, this makes the typical submit button work
+                // in addition to the ability to bind to a seperate button which clears warning
+                formElement.bind('submit', function(event) {
+                    if (formCtrl.$valid) {
+                        formCtrl.$setPristine();
+                    }
+                });
 
-            element.bind('click', function(event) {
-                ctrl.$setPristine();
-            });
-        }
-    };
-})
+                // @todo check destroy on clear button too? 
+                scope.$on('$destroy', function() {
+                    unsavedWarningSharedService.removeForm(formCtrl);
+                });
+            }
+        };
+    }
+]);
 
-.directive('unsavedWarningForm', function(unsavedWarningSharedService) {
-    return {
-        require: 'form',
-        link: function(scope, formElement, attrs, ctrl) {
 
-            // controllers will be array in order they were required
-            // save them here for ease of use
-            var formCtrl = ctrl;
+/**
+ * --------------------------------------------
+ * Lazy model adapted from vitalets
+ * @see https://github.com/vitalets/lazy-model/
+ * --------------------------------------------
+ *
+ */
+angular.module('lazyModel', [])
 
-            // initialize
-            unsavedWarningSharedService.init(formCtrl);
-
-            // bind to form submit, this makes the typical submit button work
-            // in addition to the ability to bind to a seperate button which clears warning
-            formElement.bind('submit', function(event) {
-                formCtrl.$setPristine();
-            });
-
-            // @todo check destroy on clear button too? 
-            scope.$on('$destroy', function() {
-                unsavedWarningSharedService.removeForm(formCtrl);
-            });
-        }
-    };
-});
+.directive('lazyModel', ['$parse', '$compile',
+    function($parse, $compile) {
+        return {
+            restrict: 'A',
+            priority: 500,
+            terminal: true,
+            require: '^form',
+            scope: true,
+            compile: function compile(elem, attr) {
+                // getter and setter for original model
+                var ngModelGet = $parse(attr.lazyModel);
+                var ngModelSet = ngModelGet.assign;
+                // set ng-model to buffer in isolate scope
+                elem.attr('ng-model', 'buffer');
+                // remove lazy-model attribute to exclude recursion
+                elem.removeAttr("lazy-model");
+                return {
+                    pre: function(scope, elem) {
+                        // initialize buffer value as copy of original model 
+                        scope.buffer = ngModelGet(scope.$parent);
+                        // compile element with ng-model directive pointing to buffer value   
+                        $compile(elem)(scope);
+                    },
+                    post: function postLink(scope, elem, attr, formCtrl) {
+                        // bind form submit to write back final value from buffer
+                        var form = elem.parent();
+                        while (form[0].tagName !== 'FORM') {
+                            form = form.parent();
+                        }
+                        form.bind('submit', function() {
+                            // form valid - save new value
+                            if (formCtrl.$valid) {
+                                scope.$apply(function() {
+                                    ngModelSet(scope.$parent, scope.buffer);
+                                });
+                            }
+                        });
+                        form.bind('reset', function(e) {
+                            e.preventDefault();
+                            scope.$apply(function() {
+                                scope.buffer = ngModelGet(scope.$parent);
+                            });
+                        });
+                    }
+                };
+            }
+        };
+    }
+]);
