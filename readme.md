@@ -1,15 +1,13 @@
 # An AngularJS directive for forms that alerts user of unsaved changes.
 
-`bower install angular-unsavedChanges`
- 
 _Dev Note: This module is still in development. However it's used in many of my production projects so it can be considered stable and battle tested._
 
-This directive will alert users when they navigate away and a form has unsaved changes. It will be triggered in all situations where form data would be lost.
+This directive will alert users when they navigate away from a page where a form has unsaved changes. It will be triggered in all situations where form data would be lost:
 
-- user clicks a link,
-- user navigates with forward / back button
-- user swipes (iOS),
-- user refreshes the page
+- when user clicks a link
+- when user navigates with forward / back button
+- when user swipes (iOS)
+- when user refreshes the page
 
 In addition this module: 
 
@@ -17,11 +15,11 @@ In addition this module:
 - Provides a button to disregard unsaved changes
 - Works with Angular Translate module
 - Has configurable reload and navigate messages
-- Works with Angular uiRouter's state change event.
+- Can be configured to work with Angular uiRouter's state change event.
 
 ## How it Works
 
-The directive binds to locationChangeStart which catches all navigation. For page reloads, the directive binds to window.onbeforeunload. The module defers to the forms `$dirty` property as a single source of truth. Disregarding changes sets ngForm dirty to false. 
+The directive binds to `locationChangeStart` and `window.onbeforeunload`. When these events happen all registered froms are checked if they are dirty. The module defers to the forms `$dirty` property as a single source of truth. If dirty, the user is alerted. Disregarding changes resets the form and sets pristine.  
 
 ## Basic Usage
 
@@ -35,13 +33,26 @@ The directive binds to locationChangeStart which catches all navigation. For pag
 ## API
 
 ### Directives 
-Provides two directives for use. 
+The module provides two directives for use. 
 
-`unsaved-warning-form` 
-Add to forms you want to register with directive. 
+#### unsaved-warning-form 
+Add to forms you want to register with directive. The module will only listen when forms are registered. 
 
-`unsaved-warning-clear` 
-Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. 
+```
+<form name="testForm" unsaved-warning-form>
+</form>
+```
+
+#### unsaved-warning-clear 
+Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. Note that button type should be `reset` to work with `lazy-model` directive (outlined below).
+
+```
+<form name="testForm" unsaved-warning-form>
+    <input name="test" type="text" ng-model="test"/>
+    <button type="submit"></button>
+    <button type="reset" unsaved-warning-clear></button>
+</form>
+```
 
 ### Provider Configuration 
 A number of options can be configured. The module uses the `Object.defineProperty` pattern. This avoids the need for custom getters and setters and allows us to treat configuration as pure JS objects. 
@@ -77,6 +88,16 @@ unsavedWarningsConfigProvider.navigateMessage = "Custom Navigate Message";
 Set custom message displayed when user refreshes the page. If using translate this will be the key to translate. 
 ```
 unsavedWarningsConfigProvider.reloadMessage = "Custom Reload Message";
+```
+
+## Integration with Lazy Model Directive
+
+This module includes a customized version of [Lazy Model](https://github.com/vitalets/lazy-model). Lazy model ensures that model changes are only persisted when user submits valid form. It also resets model values to their original value when form is reset. 
+
+To use this simply add `lazy-model` to your inputs instead of `ng-model`. Submitting the form will update your model, while clicking "clear changes" will reset the model values to their original state.
+
+```
+<input name="test" type="text" lazy-model="test"/>
 ```
 
 
