@@ -252,19 +252,24 @@ describe('UnsavedChanges', function() {
 
         });
 
-        describe('watch for custom event', function() {
+        describe('watch for custom events', function() {
 
-            it('defaults to $locationChangeStart', function() {
-                expect(unsavedWarningsConfig.routeEvent).toEqual('$locationChangeStart');
+            it('will always save events as array (even if set as string)', function() {
+                unsavedWarningsConfigProviderCache.routeEvent = '$hotDamn';
+                expect(unsavedWarningsConfig.routeEvent).toEqual(['$hotDamn']);
+            });
+
+            it('defaults to $locationChangeStart AND $stateChangeStart (to support ui router out of the box)', function() {
+                expect(unsavedWarningsConfig.routeEvent).toEqual(['$locationChangeStart', '$stateChangeStart']);
             });
 
             it('sets in config', function() {
                 unsavedWarningsConfigProviderCache.routeEvent = '$hotDamn';
-                expect(unsavedWarningsConfig.routeEvent).toEqual('$hotDamn');
+                expect(unsavedWarningsConfig.routeEvent).toEqual(['$hotDamn']);
             });
 
             it('gets at runtime', function() {
-                expect(unsavedWarningsConfig.routeEvent).toEqual('$locationChangeStart');
+                expect(unsavedWarningsConfig.routeEvent).toEqual(['$locationChangeStart', '$stateChangeStart']);
             });
 
         });

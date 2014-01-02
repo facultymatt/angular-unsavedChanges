@@ -15,7 +15,8 @@ In addition this module:
 - Provides a button to disregard unsaved changes
 - Works with Angular Translate module
 - Has configurable reload and navigate messages
-- Can be configured to work with Angular uiRouter's state change event.
+- Works with uiRouter by default by listeneing for `$locationChangeStart` and `$stateChangeStart` 
+- Can be configured to listen for any event
 
 ## How it Works
 
@@ -72,7 +73,7 @@ unsavedWarningsConfigProvider.logEnabled = true;
 ```
 
 #### routeEvent
-Defaults to `$locationChangeStart`. When using with ui Router, you might want to change to `$stateChangeStart`.
+Defaults to `['$locationChangeStart' ,'$stateChangeStart']` which supports ui router by default.
 
 ```
 unsavedWarningsConfigProvider.routeEvent = '$stateChangeStart';

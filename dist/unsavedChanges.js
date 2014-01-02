@@ -14,7 +14,7 @@ angular.module('unsavedChanges', ['lazyModel'])
     // defaults
     var logEnabled = false;
     var useTranslateService = true;
-    var routeEvent = '$locationChangeStart';
+    var routeEvent = ['$locationChangeStart', '$stateChangeStart'];
     var navigateMessage = 'You will lose unsaved changes if you leave this page';
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
 
@@ -50,6 +50,7 @@ angular.module('unsavedChanges', ['lazyModel'])
             return routeEvent;
         },
         set: function(value) {
+            if (typeof value === 'string') value = [value];
             routeEvent = value;
         }
     });
@@ -130,7 +131,7 @@ angular.module('unsavedChanges', ['lazyModel'])
         var _this = this;
         var allForms = [];
         var areAllFormsClean = true;
-        var removeFunction = angular.noop;
+        var removeFunctions = [angular.noop];
 
         // @note only exposed for testing purposes.
         this.allForms = function() {
@@ -180,7 +181,9 @@ angular.module('unsavedChanges', ['lazyModel'])
 
         function tearDown() {
             unsavedWarningsConfig.log('No more forms, tearing down');
-            removeFunction();
+            angular.forEach(removeFunctions, function(fn) {
+                fn();
+            });
             window.onbeforeunload = null;
         }
 
@@ -199,27 +202,29 @@ angular.module('unsavedChanges', ['lazyModel'])
 
             window.onbeforeunload = _this.confirmExit;
 
-            var eventToWatchFor = unsavedWarningsConfig.routeEvent;
+            var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
 
-            // calling this function later will unbind this, acting as $off()
-            removeFunction = $rootScope.$on(eventToWatchFor, function(event, next, current) {
-                unsavedWarningsConfig.log("user is moving with " + eventToWatchFor);
-                // @todo this could be written a lot cleaner! 
-                if (!allFormsClean()) {
-                    unsavedWarningsConfig.log("a form is dirty");
-                    if (!confirm(messages.navigate)) {
-                        unsavedWarningsConfig.log("user wants to cancel leaving");
-                        event.preventDefault(); // user clicks cancel, wants to stay on page 
+            angular.forEach(eventsToWatchFor, function(aEvent) {
+                // calling this function later will unbind this, acting as $off()
+                var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
+                    unsavedWarningsConfig.log("user is moving with " + aEvent);
+                    // @todo this could be written a lot cleaner! 
+                    if (!allFormsClean()) {
+                        unsavedWarningsConfig.log("a form is dirty");
+                        if (!confirm(messages.navigate)) {
+                            unsavedWarningsConfig.log("user wants to cancel leaving");
+                            event.preventDefault(); // user clicks cancel, wants to stay on page 
+                        } else {
+                            unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                        }
                     } else {
-                        unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                        unsavedWarningsConfig.log("all forms are clean");
                     }
-                } else {
-                    unsavedWarningsConfig.log("all forms are clean");
-                }
 
+                });
+                removeFunctions.push(removeFn);
             });
         }
-
     }
 ])
 
