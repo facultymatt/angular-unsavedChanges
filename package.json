@@ -1,6 +1,6 @@
 {
   "name": "angular-unsavedChanges",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AngularJS directive to warn user of unsaved changes when navigating away from a form.",
   "main": "Gruntfile.js",
   "devDependencies": {
