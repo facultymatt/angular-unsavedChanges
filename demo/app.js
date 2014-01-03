@@ -32,12 +32,12 @@ angular
         }
     ])
     .controller('demoCtrl', function($scope) {
-        $scope.user = {};
+        $scope.user = {
+            name: 'matt',
+            email: 'matt@facultycreative.com'
+        };
         $scope.demoFormSubmit = function() {
             $scope.message = 'Form Saved';
-            //$scope.user = {};
-        }
-        $scope.clearChanges = function() {
             $scope.user = {};
         }
     });
