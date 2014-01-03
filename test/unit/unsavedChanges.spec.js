@@ -60,7 +60,7 @@ describe('UnsavedChanges', function() {
 
         formTemplate = angular.element('<div>' +
             '<form name="testForm" unsaved-warning-form>' +
-            '<input id="test" required name="test" type="text" lazy-model="test"/>' +
+            '<input id="test" required name="test" type="text" ng-model="test" resettable/>' +
             '<button id="submit" type="submit"></button>' +
             '<button name="clear" id="clear" type="reset" unsaved-warning-clear>Clear</button>' +
             '</form>' +
