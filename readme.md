@@ -27,14 +27,14 @@ The directive binds to `locationChangeStart` and `window.onbeforeunload`. When t
 - Install from bower using `$ bower install angular-unsavedChanges --save`.
 - Include the JS, for example `<script src="bower_components/angular-unsavedChanges/dist/unsavedChanges.js"></script>`.
 - Include in your app, for example: `angular.module('app', ['unsavedChanges', 'anotherDirective'])`
-- Add attribute to your form, `unsaved-changes-warning`
+- Add attribute to your form, `unsaved-warning-form`
 - That's it!
 
 
 ## API
 
 ### Directives 
-The module provides two directives for use. 
+The module provides three directives for use. 
 
 #### unsaved-warning-form 
 Add to forms you want to register with directive. The module will only listen when forms are registered. 
@@ -53,6 +53,13 @@ Add to button or link that will disregard changes, preventing the messaging when
     <button type="submit"></button>
     <button type="reset" unsaved-warning-clear></button>
 </form>
+```
+
+#### resettable
+Add to inputs that use `ng-model` to reset model values when user dismisses changes or clicks the `unsaved-warning-clear` button.
+
+```
+<input name="email" ng-model="email" resettable />
 ```
 
 ### Provider Configuration 
@@ -89,16 +96,6 @@ unsavedWarningsConfigProvider.navigateMessage = "Custom Navigate Message";
 Set custom message displayed when user refreshes the page. If using translate this will be the key to translate. 
 ```
 unsavedWarningsConfigProvider.reloadMessage = "Custom Reload Message";
-```
-
-## Integration with Lazy Model Directive
-
-This module includes a customized version of [Lazy Model](https://github.com/vitalets/lazy-model). Lazy model ensures that model changes are only persisted when user submits valid form. It also resets model values to their original value when form is reset. 
-
-To use this simply add `lazy-model` to your inputs instead of `ng-model`. Submitting the form will update your model, while clicking "clear changes" will reset the model values to their original state.
-
-```
-<input name="test" type="text" lazy-model="test"/>
 ```
 
 
