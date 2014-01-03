@@ -2,6 +2,19 @@
 
 Versioning follows [http://semver.org/](http://semver.org/), ie: MAJOR.MINOR.PATCH. Major version 0 is initial development. Minor versions may be backwards incompatible.
 
+### 0.2.0
+
+**Breaking Changes**
+
+- Removed lazy-model integration in favor of `resettable` directive. Adding to inputs will cause their model values to be reset. Unlike the lazy-model directive the model value settings is not deferred until form submit. This avoids conflicts with validation. 
+
+### 0.1.1
+
+**Features**
+
+- routeEvent can be an array with multiple events to listen for. If user sets to string will convert to array. Defaults to `['$locationChangeStart' ,'$stateChangeStart']` which supports ui router by default.
+
+
 ### 0.1.0
 
 **Features**
