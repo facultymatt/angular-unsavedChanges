@@ -5,7 +5,7 @@
 // @todo NOTE We should investigate changing default to 
 // $routeChangeStart see https://github.com/angular-ui/ui-router/blob/3898270241d4e32c53e63554034d106363205e0e/src/compat.js#L126
 
-angular.module('unsavedChanges', ['lazyModel'])
+angular.module('unsavedChanges', ['resettable'])
 
 .provider('unsavedWarningsConfig', function() {
 
@@ -189,8 +189,8 @@ angular.module('unsavedChanges', ['lazyModel'])
 
         // Function called when user tries to close the window
         this.confirmExit = function() {
-            // @todo this could be written a lot cleaner! 
             if (!allFormsClean()) return messages.reload;
+            $rootScope.$broadcast('resetResettables');
             tearDown();
         };
 
@@ -216,6 +216,7 @@ angular.module('unsavedChanges', ['lazyModel'])
                             event.preventDefault(); // user clicks cancel, wants to stay on page 
                         } else {
                             unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                            $rootScope.$broadcast('resetResettables');
                         }
                     } else {
                         unsavedWarningsConfig.log("all forms are clean");
@@ -231,7 +232,7 @@ angular.module('unsavedChanges', ['lazyModel'])
 .directive('unsavedWarningClear', ['unsavedWarningSharedService',
     function(unsavedWarningSharedService) {
         return {
-            scope: true,
+            scope: {},
             require: '^form',
             priority: 3000,
             link: function(scope, element, attrs, formCtrl) {
@@ -247,6 +248,7 @@ angular.module('unsavedChanges', ['lazyModel'])
 .directive('unsavedWarningForm', ['unsavedWarningSharedService',
     function(unsavedWarningSharedService) {
         return {
+            scope: {},
             require: 'form',
             link: function(scope, formElement, attrs, formCtrl) {
 
@@ -273,56 +275,63 @@ angular.module('unsavedChanges', ['lazyModel'])
 
 /**
  * --------------------------------------------
- * Lazy model adapted from vitalets
+ * resettable models adapted from vitalets lazy model
  * @see https://github.com/vitalets/lazy-model/
+ *
+ * The main difference is that we DO set the model value
+ * as the user changes the inputs. However we provide a hook
+ * to reset the model to original value. This we can then
+ * broadcast on from reset which triggers resettable to revert
+ * to original value.
  * --------------------------------------------
  *
  */
-angular.module('lazyModel', [])
+angular.module('resettable', [])
 
-.directive('lazyModel', ['$parse', '$compile',
-    function($parse, $compile) {
+.directive('resettable', ['$parse', '$compile', '$rootScope',
+    function($parse, $compile, $rootScope) {
         return {
             restrict: 'A',
-            priority: 500,
-            terminal: true,
-            require: '^form',
-            scope: true,
+            require: ['^form', '?ngModel'],
             compile: function compile(elem, attr) {
-                // getter and setter for original model
-                var ngModelGet = $parse(attr.lazyModel);
-                var ngModelSet = ngModelGet.assign;
-                // set ng-model to buffer in isolate scope
-                elem.attr('ng-model', 'buffer');
-                // remove lazy-model attribute to exclude recursion
-                elem.removeAttr("lazy-model");
                 return {
-                    pre: function(scope, elem) {
-                        // initialize buffer value as copy of original model 
-                        scope.buffer = ngModelGet(scope.$parent);
-                        // compile element with ng-model directive pointing to buffer value   
-                        $compile(elem)(scope);
-                    },
-                    post: function postLink(scope, elem, attr, formCtrl) {
-                        // bind form submit to write back final value from buffer
+                    post: function postLink(scope, elem, attr, ctrls) {
+
+                        // get required controllers
+                        var formCtrl = ctrls[0];
+                        var ngModel = ctrls[1];
+                        
+                        // Find form element so we can bind on reset
                         var form = elem.parent();
                         while (form[0].tagName !== 'FORM') {
                             form = form.parent();
                         }
-                        form.bind('submit', function() {
-                            // form valid - save new value
-                            if (formCtrl.$valid) {
-                                scope.$apply(function() {
-                                    ngModelSet(scope.$parent, scope.buffer);
-                                });
-                            }
+
+                        var setter, getter, originalValue;
+
+                        // save getters and setters and store the original value. 
+                        attr.$observe('ngModel', function(newValue) {
+                            getter = $parse(attr.ngModel);
+                            setter = getter.assign;
+                            originalValue = getter(scope);
                         });
+
+                        // reset our form to original value
+                        var resetFn = function() {
+                            setter(scope, originalValue);
+                            formCtrl.$setPristine();
+                        };
+
+                        // reset and set form back to pristine
+                        // will be triggered by reset button
                         form.bind('reset', function(e) {
                             e.preventDefault();
-                            scope.$apply(function() {
-                                scope.buffer = ngModelGet(scope.$parent);
-                            });
+                            scope.$apply(resetFn);
                         });
+
+                        // reset without digest so we don't trigger the 
+                        // form to be dirty again.
+                        $rootScope.$on('resetResettables', resetFn);
                     }
                 };
             }
