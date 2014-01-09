@@ -105,6 +105,7 @@ describe('UnsavedChanges', function() {
         // @note logs will not occur if we are not calling through
         spyOn(console, 'log').andCallThrough();
         spyOn(controllerScope.testForm, '$setPristine').andCallThrough();
+        spyOn($rootScope, '$emit').andCallThrough();
 
     }));
 
@@ -112,15 +113,22 @@ describe('UnsavedChanges', function() {
 
         describe('Clear', function() {
 
+            beforeEach(function() {
+                var clear = formTemplate.find('#clear');
+                clear.click();
+                controllerScope.$digest();
+            });
+
             it('creates isolate scope', function() {});
 
             // needs to be registered within a form...
             // @todo throw warning or document
             it('calls $setPristine() on parent form when clicked', function() {
-                var clear = formTemplate.find('#clear');
-                clear.click();
-                controllerScope.$digest();
                 expect(controllerScope.testForm.$setPristine).toHaveBeenCalled();
+            });
+
+            it('calls $emits message when clicked', function() {
+              expect($rootScope.$emit).toHaveBeenCalledWith('resetResettables');
             });
 
         });

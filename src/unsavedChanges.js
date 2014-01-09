@@ -327,6 +327,7 @@ angular.module('resettable', [])
                         form.bind('reset', function(e) {
                             e.preventDefault();
                             scope.$apply(resetFn);
+                            $rootScope.$emit('resetResettables');
                         });
 
                         // reset without digest so we don't trigger the 
