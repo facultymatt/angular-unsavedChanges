@@ -2,6 +2,10 @@
 
 Versioning follows [http://semver.org/](http://semver.org/), ie: MAJOR.MINOR.PATCH. Major version 0 is initial development. Minor versions may be backwards incompatible.
 
+### 0.2.2-alpha.1
+
+Added `$rootScope.$emit('resetResettables')` to form directive on reset. This allows hooking into reset without using resettable directive.
+
 ### 0.2.1-alpha.1
 
 Form not emits `$rootScope.$emit('resetResettables')` when reset. This allows developers to do fancy things like reset validation or message user on form reset. Previously `resetResettables` was only called when use dismissed changes with alert dialog. 

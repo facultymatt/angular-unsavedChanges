@@ -245,8 +245,8 @@ angular.module('unsavedChanges', ['resettable'])
     }
 ])
 
-.directive('unsavedWarningForm', ['unsavedWarningSharedService',
-    function(unsavedWarningSharedService) {
+.directive('unsavedWarningForm', ['unsavedWarningSharedService', '$rootScope',
+    function(unsavedWarningSharedService, $rootScope) {
         return {
             scope: {},
             require: 'form',
@@ -261,6 +261,12 @@ angular.module('unsavedChanges', ['resettable'])
                     if (formCtrl.$valid) {
                         formCtrl.$setPristine();
                     }
+                });
+
+                // bind to form submit, this makes the typical submit button work
+                // in addition to the ability to bind to a seperate button which clears warning
+                formElement.bind('reset', function(event) {
+                    $rootScope.$emit('resetResettables');
                 });
 
                 // @todo check destroy on clear button too? 
