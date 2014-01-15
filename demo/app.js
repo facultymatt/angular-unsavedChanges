@@ -19,8 +19,8 @@ angular
     ])
     .controller('demoCtrl', function($scope) {
         $scope.user = {
-            name: 'matt',
-            email: 'matt@facultycreative.com'
+            name: '',
+            email: ''
         };
         $scope.demoFormSubmit = function() {
             $scope.message = 'Form Saved';

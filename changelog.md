@@ -2,6 +2,14 @@
 
 Versioning follows [http://semver.org/](http://semver.org/), ie: MAJOR.MINOR.PATCH. Major version 0 is initial development. Minor versions may be backwards incompatible.
 
+### 0.2.3-alpha.1
+
+- Removed form and model dependencies and code from `resettable` directive. We weren't using the get form functionality anyhow. 
+- Moved form reset events out of the resettable directive to prevent them from being called multiple times unnecessarily.
+- Fixed bug where resettable functions were piling up and not properly being removed when scope was destroyed. 
+- Module now consistently broadcasts `resetResettables` from $rootScope when user resets form or dismisses alert dialog. (previously this was sometimes called twice)
+
+
 ### 0.2.2-alpha.1
 
 Added `$rootScope.$emit('resetResettables')` to form directive on reset. This allows hooking into reset without using resettable directive.

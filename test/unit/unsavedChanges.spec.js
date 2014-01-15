@@ -105,7 +105,7 @@ describe('UnsavedChanges', function() {
         // @note logs will not occur if we are not calling through
         spyOn(console, 'log').andCallThrough();
         spyOn(controllerScope.testForm, '$setPristine').andCallThrough();
-        spyOn($rootScope, '$emit').andCallThrough();
+        spyOn($rootScope, '$broadcast').andCallThrough();
 
     }));
 
@@ -127,8 +127,8 @@ describe('UnsavedChanges', function() {
                 expect(controllerScope.testForm.$setPristine).toHaveBeenCalled();
             });
 
-            it('calls $emits message when clicked', function() {
-              expect($rootScope.$emit).toHaveBeenCalledWith('resetResettables');
+            it('calls $broadcast message when clicked', function() {
+              expect($rootScope.$broadcast).toHaveBeenCalledWith('resetResettables');
             });
 
         });

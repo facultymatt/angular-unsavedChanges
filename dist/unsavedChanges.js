@@ -2,9 +2,6 @@
 /*jshint globalstrict: true*/
 /*jshint undef:false */
 
-// @todo NOTE We should investigate changing default to 
-// $routeChangeStart see https://github.com/angular-ui/ui-router/blob/3898270241d4e32c53e63554034d106363205e0e/src/compat.js#L126
-
 angular.module('unsavedChanges', ['resettable'])
 
 .provider('unsavedWarningsConfig', function() {
@@ -205,7 +202,7 @@ angular.module('unsavedChanges', ['resettable'])
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
 
             angular.forEach(eventsToWatchFor, function(aEvent) {
-                // calling this function later will unbind this, acting as $off()
+                //calling this function later will unbind this, acting as $off()
                 var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
                     unsavedWarningsConfig.log("user is moving with " + aEvent);
                     // @todo this could be written a lot cleaner! 
@@ -234,7 +231,7 @@ angular.module('unsavedChanges', ['resettable'])
         return {
             scope: {},
             require: '^form',
-            priority: 3000,
+            priority: 10,
             link: function(scope, element, attrs, formCtrl) {
                 element.bind('click', function(event) {
                     formCtrl.$setPristine();
@@ -263,10 +260,22 @@ angular.module('unsavedChanges', ['resettable'])
                     }
                 });
 
-                // bind to form submit, this makes the typical submit button work
-                // in addition to the ability to bind to a seperate button which clears warning
+                // bind to form submit
+                // developers can hook into resetResettables to do
+                // do things like reset validation, present messages, etc.
                 formElement.bind('reset', function(event) {
-                    $rootScope.$emit('resetResettables');
+                    event.preventDefault();
+                    // because we bind to `resetResettables` also when
+                    // dismissing alerts, we need to apply() in this 
+                    // instance to ensure the model view updates. 
+                    // @note for ngActiveResoruce, where the models
+                    // themselves do validation, we can't rely on just
+                    // setting the form to valid - we need to set each 
+                    // model value back to valid.
+                    scope.$apply($rootScope.$broadcast('resetResettables'));
+
+                    // sets for back to valid and pristine states
+                    formCtrl.$setPristine();
                 });
 
                 // @todo check destroy on clear button too? 
@@ -296,51 +305,31 @@ angular.module('resettable', [])
 
 .directive('resettable', ['$parse', '$compile', '$rootScope',
     function($parse, $compile, $rootScope) {
+
         return {
+            scope: true,
             restrict: 'A',
-            require: ['^form', '?ngModel'],
-            compile: function compile(elem, attr) {
-                return {
-                    post: function postLink(scope, elem, attr, ctrls) {
+            link: function postLink(scope, elem, attr, ngModelCtrl) {
 
-                        // get required controllers
-                        var formCtrl = ctrls[0];
-                        var ngModel = ctrls[1];
-                        
-                        // Find form element so we can bind on reset
-                        var form = elem.parent();
-                        while (form[0].tagName !== 'FORM') {
-                            form = form.parent();
-                        }
+                var setter, getter, originalValue;
 
-                        var setter, getter, originalValue;
+                // save getters and setters and store the original value. 
+                attr.$observe('ngModel', function(newValue) {
+                    getter = $parse(attr.ngModel);
+                    setter = getter.assign;
+                    originalValue = getter(scope);
+                });
 
-                        // save getters and setters and store the original value. 
-                        attr.$observe('ngModel', function(newValue) {
-                            getter = $parse(attr.ngModel);
-                            setter = getter.assign;
-                            originalValue = getter(scope);
-                        });
-
-                        // reset our form to original value
-                        var resetFn = function() {
-                            setter(scope, originalValue);
-                            formCtrl.$setPristine();
-                        };
-
-                        // reset and set form back to pristine
-                        // will be triggered by reset button
-                        form.bind('reset', function(e) {
-                            e.preventDefault();
-                            scope.$apply(resetFn);
-                            $rootScope.$emit('resetResettables');
-                        });
-
-                        // reset without digest so we don't trigger the 
-                        // form to be dirty again.
-                        $rootScope.$on('resetResettables', resetFn);
-                    }
+                // reset our form to original value
+                var resetFn = function() {
+                    setter(scope, originalValue);
                 };
+
+                // @note this doesn't work if called using
+                // $rootScope.on() and $rootScope.$emit() pattern
+                var removeListenerFn = scope.$on('resetResettables', resetFn);
+                scope.$on('$destroy', removeListenerFn);
+
             }
         };
     }
