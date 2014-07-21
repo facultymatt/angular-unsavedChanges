@@ -65,7 +65,7 @@ angular.module('unsavedChanges', ['resettable'])
 
             function translateIfAble(message) {
                 if ($injector.has('$translate') && useTranslateService) {
-                    return $injector.get('$translate')(message);
+                    return $injector.get('$translate').instant(message);
                 } else {
                     return false;
                 }
@@ -135,12 +135,6 @@ angular.module('unsavedChanges', ['resettable'])
             return allForms;
         };
 
-        // save shorthand reference to messages
-        var messages = {
-            navigate: unsavedWarningsConfig.navigateMessage,
-            reload: unsavedWarningsConfig.reloadMessage
-        };
-
         // Check all registered forms
         // if any one is dirty function will return true
 
@@ -186,7 +180,7 @@ angular.module('unsavedChanges', ['resettable'])
 
         // Function called when user tries to close the window
         this.confirmExit = function() {
-            if (!allFormsClean()) return messages.reload;
+            if (!allFormsClean()) return unsavedWarningsConfig.reloadMessage;
             $rootScope.$broadcast('resetResettables');
             tearDown();
         };
@@ -208,7 +202,7 @@ angular.module('unsavedChanges', ['resettable'])
                     // @todo this could be written a lot cleaner!
                     if (!allFormsClean()) {
                         unsavedWarningsConfig.log("a form is dirty");
-                        if (!confirm(messages.navigate)) {
+                        if (!confirm(unsavedWarningsConfig.navigateMessage)) {
                             unsavedWarningsConfig.log("user wants to cancel leaving");
                             event.preventDefault(); // user clicks cancel, wants to stay on page
                         } else {

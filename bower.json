@@ -32,7 +32,7 @@
     "angular-mocks": "~1.2.2",
     "angular-scenario": "~1.2.2",
     "jquery": "~2.0.3",
-    "angular-translate": "latest"
+    "angular-translate": "^2.0.1"
   },
   "resolutions": {
     "angular": "~1.2.5"
