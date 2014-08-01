@@ -34,6 +34,15 @@ angular.module('unsavedChanges', ['resettable'])
         }
     });
 
+    Object.defineProperty(_this, 'disableReloadConfirm', {
+      get: function() {
+        return disableReloadConfirm;
+      },
+      set: function(value) {
+        disableReloadConfirm = value;
+      }
+    });
+
     Object.defineProperty(_this, 'useTranslateService', {
         get: function() {
             return useTranslateService;
