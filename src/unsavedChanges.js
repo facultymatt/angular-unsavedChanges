@@ -14,6 +14,7 @@ angular.module('unsavedChanges', ['resettable'])
     var routeEvent = ['$locationChangeStart', '$stateChangeStart'];
     var navigateMessage = 'You will lose unsaved changes if you leave this page';
     var reloadMessage = 'You will lose unsaved changes if you reload this page';
+    var disableReloadConfirm = false;
 
     Object.defineProperty(_this, 'navigateMessage', {
         get: function() {
@@ -31,6 +32,15 @@ angular.module('unsavedChanges', ['resettable'])
         set: function(value) {
             reloadMessage = value;
         }
+    });
+
+    Object.defineProperty(_this, 'disableReloadConfirm', {
+      get: function() {
+        return disableReloadConfirm;
+      },
+      set: function(value) {
+        disableReloadConfirm = value;
+      }
     });
 
     Object.defineProperty(_this, 'useTranslateService', {
@@ -90,6 +100,12 @@ angular.module('unsavedChanges', ['resettable'])
                 get: function() {
                     return useTranslateService;
                 }
+            });
+
+            Object.defineProperty(publicInterface, 'disableReloadConfirm', {
+              get: function() {
+                return disableReloadConfirm;
+              }
             });
 
             Object.defineProperty(publicInterface, 'reloadMessage', {
@@ -197,7 +213,9 @@ angular.module('unsavedChanges', ['resettable'])
         function setup() {
             unsavedWarningsConfig.log('Setting up');
 
-            window.onbeforeunload = _this.confirmExit;
+            if (!unsavedWarningsConfig.disableReloadConfirm) {
+              window.onbeforeunload = _this.confirmExit;
+            }
 
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
 
