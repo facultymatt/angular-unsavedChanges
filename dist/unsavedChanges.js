@@ -128,7 +128,7 @@ angular.module('unsavedChanges', ['resettable'])
         var _this = this;
         var allForms = [];
         var areAllFormsClean = true;
-        var removeFunctions = [angular.noop];
+        var removeFunctions = [];
 
         // @note only exposed for testing purposes.
         this.allForms = function() {
@@ -141,7 +141,7 @@ angular.module('unsavedChanges', ['resettable'])
             reload: unsavedWarningsConfig.reloadMessage
         };
 
-        // Check all registered forms 
+        // Check all registered forms
         // if any one is dirty function will return true
 
         function allFormsClean() {
@@ -167,7 +167,7 @@ angular.module('unsavedChanges', ['resettable'])
             var idx = allForms.indexOf(form);
 
             // this form is not present array
-            // @todo needs test coverage 
+            // @todo needs test coverage
             if (idx === -1) return;
 
             allForms.splice(idx, 1);
@@ -181,6 +181,7 @@ angular.module('unsavedChanges', ['resettable'])
             angular.forEach(removeFunctions, function(fn) {
                 fn();
             });
+            removeFunctions = [];
             window.onbeforeunload = null;
         }
 
@@ -205,12 +206,12 @@ angular.module('unsavedChanges', ['resettable'])
                 //calling this function later will unbind this, acting as $off()
                 var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
                     unsavedWarningsConfig.log("user is moving with " + aEvent);
-                    // @todo this could be written a lot cleaner! 
+                    // @todo this could be written a lot cleaner!
                     if (!allFormsClean()) {
                         unsavedWarningsConfig.log("a form is dirty");
                         if (!confirm(messages.navigate)) {
                             unsavedWarningsConfig.log("user wants to cancel leaving");
-                            event.preventDefault(); // user clicks cancel, wants to stay on page 
+                            event.preventDefault(); // user clicks cancel, wants to stay on page
                         } else {
                             unsavedWarningsConfig.log("user doesn't care about loosing stuff");
                             $rootScope.$broadcast('resetResettables');
@@ -266,11 +267,11 @@ angular.module('unsavedChanges', ['resettable'])
                 formElement.bind('reset', function(event) {
                     event.preventDefault();
                     // because we bind to `resetResettables` also when
-                    // dismissing alerts, we need to apply() in this 
-                    // instance to ensure the model view updates. 
+                    // dismissing alerts, we need to apply() in this
+                    // instance to ensure the model view updates.
                     // @note for ngActiveResoruce, where the models
                     // themselves do validation, we can't rely on just
-                    // setting the form to valid - we need to set each 
+                    // setting the form to valid - we need to set each
                     // model value back to valid.
                     scope.$apply($rootScope.$broadcast('resetResettables'));
 
@@ -278,7 +279,7 @@ angular.module('unsavedChanges', ['resettable'])
                     formCtrl.$setPristine();
                 });
 
-                // @todo check destroy on clear button too? 
+                // @todo check destroy on clear button too?
                 scope.$on('$destroy', function() {
                     unsavedWarningSharedService.removeForm(formCtrl);
                 });
@@ -313,7 +314,7 @@ angular.module('resettable', [])
 
                 var setter, getter, originalValue;
 
-                // save getters and setters and store the original value. 
+                // save getters and setters and store the original value.
                 attr.$observe('ngModel', function(newValue) {
                     getter = $parse(attr.ngModel);
                     setter = getter.assign;
