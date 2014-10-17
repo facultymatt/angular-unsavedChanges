@@ -128,7 +128,7 @@ angular.module('unsavedChanges', ['resettable'])
         var _this = this;
         var allForms = [];
         var areAllFormsClean = true;
-        var removeFunctions = [angular.noop];
+        var removeFunctions = [];
 
         // @note only exposed for testing purposes.
         this.allForms = function() {
@@ -175,6 +175,7 @@ angular.module('unsavedChanges', ['resettable'])
             angular.forEach(removeFunctions, function(fn) {
                 fn();
             });
+            removeFunctions = [];
             window.onbeforeunload = null;
         }
 
