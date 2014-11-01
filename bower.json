@@ -1,6 +1,6 @@
 {
   "name": "angular-unsavedChanges",
-  "version": "0.2.3-alpha.1",
+  "version": "0.2.5",
   "homepage": "https://github.com/facultymatt/angular-unsavedChanges",
   "authors": [
     "Matt Miller <matt@facultycreative.com>"
@@ -24,17 +24,12 @@
     "test",
     "tests"
   ],
-  "dependencies": {
-    "angular": "~1.2.5"
-  },
   "devDependencies": {
-    "angular-route": "~1.2.2",
-    "angular-mocks": "~1.2.2",
-    "angular-scenario": "~1.2.2",
+    "angular": "~1.2.5",
+    "angular-route": "~1.2.5",
+    "angular-mocks": "~1.2.5",
+    "angular-scenario": "~1.2.5",
     "jquery": "~2.0.3",
-    "angular-translate": "latest"
-  },
-  "resolutions": {
-    "angular": "~1.2.5"
+    "angular-translate": "^2.0.1"
   }
 }
