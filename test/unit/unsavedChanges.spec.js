@@ -302,6 +302,33 @@ describe('UnsavedChanges', function() {
             expect(controllerScope.testForm.test.$modelValue).toEqual(undefined);
         });
 
+        it('exposes new value on ng-change', function() {
+           var didFire = false;
+           
+           var newScope = $rootScope.$new();
+           newScope.test = 'a new default value';
+
+           newScope.didChange = function(newValue) {
+            didFire = newScope.test;
+           }
+           formTemplate = angular.element('<div>' +
+            '<form name="newForm" unsaved-warning-form>' +
+            '<input id="test" required name="test" type="text" ng-model="test" ng-change="didChange()" resettable/>' +
+            '<button id="submit" type="submit"></button>' +
+            '</form>' +
+            '</div>');
+
+           $compile(formTemplate)(newScope);
+           
+           inputCtrl = formTemplate.find('#test').controller('ngModel');
+           inputCtrl.$setViewValue('things are changing');
+
+           controllerScope.$digest();
+
+           expect(didFire).toEqual('things are changing');
+           expect(newScope.newForm.test.$modelValue).toEqual('things are changing'); 
+        });
+
         it('resets to original model value on form navigate', function() {});
 
         it('observes ngModel and only sets original value when value is resolved', function() {});
