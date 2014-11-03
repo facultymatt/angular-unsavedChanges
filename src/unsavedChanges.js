@@ -241,7 +241,7 @@ angular.module('unsavedChanges', ['resettable'])
     function(unsavedWarningSharedService, $rootScope) {
         return {
             scope: {},
-            require: 'form',
+            require: '^form',
             link: function(scope, formElement, attrs, formCtrl) {
 
                 // register this form
