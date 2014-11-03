@@ -135,7 +135,9 @@ describe('UnsavedChanges', function() {
 
         describe('Form', function() {
 
-            it('creates isolate scope', function() {});
+            it('creates isolate scope', function() {
+                expect(controllerScope.$parent).toEqual($rootScope);
+            });
 
             it('adds listener to onbeforeunload to detect page reload', function() {
                 expect($window.onbeforeunload.toString()).toContain('allFormsClean()');
