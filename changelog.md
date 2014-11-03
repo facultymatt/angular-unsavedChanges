@@ -2,6 +2,21 @@
 
 Versioning follows [http://semver.org/](http://semver.org/), ie: MAJOR.MINOR.PATCH. Major version 0 is initial development. Minor versions may be backwards incompatible.
 
+### 0.2.3-alpha.2 
+
+__angular-unsavedChanges will remain in alpha until the e2e tests pass, as per https://github.com/facultymatt/angular-unsavedChanges/issues/25__
+
+
+- Fixed support for angular translate > 2.0.0 [#14](https://github.com/facultymatt/angular-unsavedChanges/pull/14), thanks to @dmytroyarmak
+- Fixed issue where removeFunctions were not being cleared properly [#21](https://github.com/facultymatt/angular-unsavedChanges/pull/21), thanks to @dmytroyarmak
+- fix unit tests for jasmine 2.0
+- add test for isolate scope on form element
+- require form on element or parent, fixes #22
+- use $window instead of window
+- update to angular 1.3, closes #23
+
+
+
 ### 0.2.3-alpha.1
 
 - Removed form and model dependencies and code from `resettable` directive. We weren't using the get form functionality anyhow. 
