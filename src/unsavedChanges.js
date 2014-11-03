@@ -121,8 +121,8 @@ angular.module('unsavedChanges', ['resettable'])
     ];
 })
 
-.service('unsavedWarningSharedService', ['$rootScope', 'unsavedWarningsConfig', '$injector',
-    function($rootScope, unsavedWarningsConfig, $injector) {
+.service('unsavedWarningSharedService', ['$rootScope', 'unsavedWarningsConfig', '$injector', '$window',
+    function($rootScope, unsavedWarningsConfig, $injector, $window) {
 
         // Controller scopped variables
         var _this = this;
@@ -176,7 +176,7 @@ angular.module('unsavedChanges', ['resettable'])
                 fn();
             });
             removeFunctions = [];
-            window.onbeforeunload = null;
+            $window.onbeforeunload = null;
         }
 
         // Function called when user tries to close the window
@@ -192,7 +192,7 @@ angular.module('unsavedChanges', ['resettable'])
         function setup() {
             unsavedWarningsConfig.log('Setting up');
 
-            window.onbeforeunload = _this.confirmExit;
+            $window.onbeforeunload = _this.confirmExit;
 
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
 
