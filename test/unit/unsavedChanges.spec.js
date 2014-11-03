@@ -103,9 +103,9 @@ describe('UnsavedChanges', function() {
         controllerScope.test = 'default value';
 
         // @note logs will not occur if we are not calling through
-        spyOn(console, 'log').andCallThrough();
-        spyOn(controllerScope.testForm, '$setPristine').andCallThrough();
-        spyOn($rootScope, '$broadcast').andCallThrough();
+        spyOn(console, 'log').and.callThrough();
+        spyOn(controllerScope.testForm, '$setPristine').and.callThrough();
+        spyOn($rootScope, '$broadcast').and.callThrough();
 
     }));
 
