@@ -295,6 +295,10 @@ angular.module('unsavedChanges', ['resettable'])
  * to original value.
  * --------------------------------------------
  *
+ * @note we don't create a seperate scope so the model value
+ * is still available onChange within the controller scope. 
+ * This fixes https://github.com/facultymatt/angular-unsavedChanges/issues/19
+ *
  */
 angular.module('resettable', [])
 
@@ -302,7 +306,6 @@ angular.module('resettable', [])
     function($parse, $compile, $rootScope) {
 
         return {
-            scope: true,
             restrict: 'A',
             link: function postLink(scope, elem, attr, ngModelCtrl) {
 
