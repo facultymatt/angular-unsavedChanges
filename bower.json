@@ -3,10 +3,10 @@
   "version": "0.2.5",
   "homepage": "https://github.com/facultymatt/angular-unsavedChanges",
   "authors": [
-    "Matt Miller <matt@facultycreative.com>"
+    "Matt Miller <mattmillerart@gmail.com>"
   ],
   "description": "AngularJS directive to warn user of unsaved changes when navigating away from a form.",
-  "main": "unsavedChanges.js",
+  "main": "dist/unsavedChanges.js",
   "keywords": [
     "form",
     "angularjs",
