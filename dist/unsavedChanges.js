@@ -244,6 +244,20 @@ angular.module('unsavedChanges', ['resettable'])
             require: '^form',
             link: function(scope, formElement, attrs, formCtrl) {
 
+                // @todo refactor, temp fix for issue #22
+                // where user might use form on element inside a form
+                // we shouldnt need isolate scope on this, but it causes the tests to fail
+                // traverse up parent elements to find the form.
+                // we need a form element since we bind to form events: submit, reset
+                var count = 0;
+                while(formElement[0].tagName !== 'FORM' && count < 3) {
+                    count++;
+                    formElement = formElement.parent();
+                }
+                if(count >= 3) {
+                    throw('unsavedWarningForm must be inside a form element');
+                }
+
                 // register this form
                 unsavedWarningSharedService.init(formCtrl);
 
@@ -260,14 +274,12 @@ angular.module('unsavedChanges', ['resettable'])
                 // do things like reset validation, present messages, etc.
                 formElement.bind('reset', function(event) {
                     event.preventDefault();
-                    // because we bind to `resetResettables` also when
-                    // dismissing alerts, we need to apply() in this
-                    // instance to ensure the model view updates.
-                    // @note for ngActiveResoruce, where the models
-                    // themselves do validation, we can't rely on just
-                    // setting the form to valid - we need to set each
-                    // model value back to valid.
-                    scope.$apply($rootScope.$broadcast('resetResettables'));
+                    
+                    // trigger resettables within this form or element 
+                    var resettables = angular.element(formElement[0].querySelector('[resettable]'));
+                    if(resettables.length) {
+                        scope.$apply(resettables.triggerHandler('resetResettables'));    
+                    }
 
                     // sets for back to valid and pristine states
                     formCtrl.$setPristine();
@@ -295,6 +307,10 @@ angular.module('unsavedChanges', ['resettable'])
  * to original value.
  * --------------------------------------------
  *
+ * @note we don't create a seperate scope so the model value
+ * is still available onChange within the controller scope. 
+ * This fixes https://github.com/facultymatt/angular-unsavedChanges/issues/19
+ *
  */
 angular.module('resettable', [])
 
@@ -302,7 +318,6 @@ angular.module('resettable', [])
     function($parse, $compile, $rootScope) {
 
         return {
-            scope: true,
             restrict: 'A',
             link: function postLink(scope, elem, attr, ngModelCtrl) {
 
@@ -319,6 +334,8 @@ angular.module('resettable', [])
                 var resetFn = function() {
                     setter(scope, originalValue);
                 };
+
+                elem.on('resetResettables', resetFn);
 
                 // @note this doesn't work if called using
                 // $rootScope.on() and $rootScope.$emit() pattern
