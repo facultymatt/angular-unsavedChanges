@@ -260,14 +260,12 @@ angular.module('unsavedChanges', ['resettable'])
                 // do things like reset validation, present messages, etc.
                 formElement.bind('reset', function(event) {
                     event.preventDefault();
-                    // because we bind to `resetResettables` also when
-                    // dismissing alerts, we need to apply() in this
-                    // instance to ensure the model view updates.
-                    // @note for ngActiveResoruce, where the models
-                    // themselves do validation, we can't rely on just
-                    // setting the form to valid - we need to set each
-                    // model value back to valid.
-                    scope.$apply($rootScope.$broadcast('resetResettables'));
+                    
+                    // trigger resettables within this form or element 
+                    var resettables = angular.element(formElement[0].querySelector('[resettable]'));
+                    if(resettables.length) {
+                        scope.$apply(resettables.triggerHandler('resetResettables'));    
+                    }
 
                     // sets for back to valid and pristine states
                     formCtrl.$setPristine();
@@ -322,6 +320,8 @@ angular.module('resettable', [])
                 var resetFn = function() {
                     setter(scope, originalValue);
                 };
+
+                elem.on('resetResettables', resetFn);
 
                 // @note this doesn't work if called using
                 // $rootScope.on() and $rootScope.$emit() pattern

@@ -127,7 +127,7 @@ describe('UnsavedChanges', function() {
                 expect(controllerScope.testForm.$setPristine).toHaveBeenCalled();
             });
 
-            it('calls $broadcast message when clicked', function() {
+            xit('calls $broadcast message when clicked', function() {
               expect($rootScope.$broadcast).toHaveBeenCalledWith('resetResettables');
             });
 
@@ -300,6 +300,55 @@ describe('UnsavedChanges', function() {
             reset.click();
             controllerScope.$digest();
             expect(controllerScope.testForm.test.$modelValue).toEqual(undefined);
+        });
+
+        it('only values in this form', function() {
+
+            var newScope = $rootScope.$new();
+            newScope.test1 = 'test1 default';
+            newScope.test2 = 'test2 default';
+            newScope.test3 = 'test3 default';
+
+            formTemplate = angular.element('<div>' +
+                '<form id="form1" name="form1" unsaved-warning-form>' +
+                    '<input id="test1" required name="test1" type="text" ng-model="test1" resettable/>' +
+                    '<button name="clear1" id="clear1" type="reset" unsaved-warning-clear>Clear</button>' +
+                '</form>' +
+                
+                '<form id="form2" name="form2" unsaved-warning-form>' +
+                    '<input id="test2" required name="test2" type="text" ng-model="test2" resettable/>' +
+                    '<button name="clear2" id="clear2" type="reset" unsaved-warning-clear>Clear</button>' +
+                '</form>' +
+
+                '<form id="form3" name="form3" unsaved-warning-form>' +
+                    '<input id="test3" required name="test3" type="text" ng-model="test3" resettable/>' +
+                    '<button name="clear3" id="clear3" type="reset" unsaved-warning-clear>Clear</button>' +
+                '</form>' +
+
+                '</div>');
+
+            $compile(formTemplate)(newScope);
+            newScope.$digest();
+
+            // change values for all inputs
+            newScope.test1 = 'test1 changed';
+            newScope.test2 = 'test2 changed';
+            newScope.test3 = 'test3 changed';
+
+            // clear form one changes only
+            formTemplate.find('#clear1').click();
+            newScope.$digest();
+
+            expect(newScope.test1).toEqual('test1 default');
+            expect(newScope.test2).toEqual('test2 changed');
+            expect(newScope.test3).toEqual('test3 changed');
+
+            // debugging scope
+            // expect(newScope.$parent).toEqual($rootScope);
+            // expect(formTemplate.find('#form1').scope()).toEqual(newScope);
+            // expect(formTemplate.find('#form2').scope()).toEqual(newScope);
+            // expect(formTemplate.find('#form3').scope()).toEqual(newScope);
+
         });
 
         it('exposes new value on ng-change', function() {
