@@ -249,8 +249,13 @@ angular.module('unsavedChanges', ['resettable'])
                 // we shouldnt need isolate scope on this, but it causes the tests to fail
                 // traverse up parent elements to find the form.
                 // we need a form element since we bind to form events: submit, reset
-                while(formElement.tagName !== 'form') {
+                var count = 0;
+                while(formElement[0].tagName !== 'FORM' && count < 3) {
+                    count++;
                     formElement = formElement.parent();
+                }
+                if(count >= 3) {
+                    throw('unsavedWarningForm must be inside a form element');
                 }
 
                 // register this form
