@@ -302,7 +302,7 @@ describe('UnsavedChanges', function() {
             expect(controllerScope.testForm.test.$modelValue).toEqual(undefined);
         });
 
-        it('only values in this form', function() {
+        it('only resets values within this form', function() {
 
             var newScope = $rootScope.$new();
             newScope.test1 = 'test1 default';
@@ -348,6 +348,37 @@ describe('UnsavedChanges', function() {
             // expect(formTemplate.find('#form1').scope()).toEqual(newScope);
             // expect(formTemplate.find('#form2').scope()).toEqual(newScope);
             // expect(formTemplate.find('#form3').scope()).toEqual(newScope);
+
+        });
+
+        it('can be used as child element of form', function() {
+
+            var newScope = $rootScope.$new();
+            newScope.test1 = 'test1 default';
+
+            formTemplate = angular.element('<div>' +
+                '<form id="form1" name="form1">' +
+                    '<div>' + 
+                        '<div unsaved-warning-form>' + 
+                            '<input id="test1" required name="test1" type="text" ng-model="test1" resettable/>' +
+                            '<button name="clear1" id="clear1" type="reset" unsaved-warning-clear>Clear</button>' +
+                        '</div>' + 
+                    '</div>' +
+                '</form>' +
+
+                '</div>');
+
+            $compile(formTemplate)(newScope);
+            newScope.$digest();
+
+            // change values for all inputs
+            newScope.test1 = 'test1 changed';
+
+            // clear form one changes only
+            formTemplate.find('#clear1').click();
+            newScope.$digest();
+
+            expect(newScope.test1).toEqual('test1 default');
 
         });
 

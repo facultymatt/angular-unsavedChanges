@@ -244,6 +244,15 @@ angular.module('unsavedChanges', ['resettable'])
             require: '^form',
             link: function(scope, formElement, attrs, formCtrl) {
 
+                // @todo refactor, temp fix for issue #22
+                // where user might use form on element inside a form
+                // we shouldnt need isolate scope on this, but it causes the tests to fail
+                // traverse up parent elements to find the form.
+                // we need a form element since we bind to form events: submit, reset
+                while(formElement.tagName !== 'form') {
+                    formElement = formElement.parent();
+                }
+
                 // register this form
                 unsavedWarningSharedService.init(formCtrl);
 
