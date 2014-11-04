@@ -44,8 +44,20 @@ Add to forms you want to register with directive. The module will only listen wh
 </form>
 ```
 
+Optionally, you can add to an element within a form:
+
+```
+<form name="testForm">
+	<div unsaved-warning-form>
+	</div>
+</form>
+```
+
+When used in this way, it must be no more then 3 levels nested within parent form.
+
+
 #### unsaved-warning-clear 
-Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. Note that button type should be `reset` to work with `lazy-model` directive (outlined below).
+Add to button or link that will disregard changes, preventing the messaging when user tries to navigate. Note that button type should be `reset`.
 
 ```
 <form name="testForm" unsaved-warning-form>
@@ -61,6 +73,11 @@ Add to inputs that use `ng-model` to reset model values when user dismisses chan
 ```
 <input name="email" ng-model="email" resettable />
 ```
+
+Note that if you have multiple forms on the page, only the model values inside the form which was reset will be effected. 
+
+On page change or reload, all model values will be effected. 
+
 
 ### Provider Configuration 
 A number of options can be configured. The module uses the `Object.defineProperty` pattern. This avoids the need for custom getters and setters and allows us to treat configuration as pure JS objects. 
