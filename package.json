@@ -6,6 +6,7 @@
   "devDependencies": {
     "grunt-strip": "~0.2.1",
     "express": "latest",
+    "tmp": "0.0.23",
     "bower": "~1.2.6",
     "grunt": "~0.4.1",
     "grunt-shell": "~0.4.0",
