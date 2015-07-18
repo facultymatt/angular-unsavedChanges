@@ -39,7 +39,8 @@
     "grunt-jsbeautifier": "~0.2.3",
     "grunt-replace": "~0.5.1",
     "grunt-contrib-jshint": "~0.6.3",
-    "grunt-yui-compressor": "~0.3.0"
+    "grunt-yui-compressor": "~0.3.0",
+    "tmp": "0.0.23"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
