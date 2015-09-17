@@ -203,13 +203,16 @@ angular.module('unsavedChanges', ['resettable'])
                     // @todo this could be written a lot cleaner!
                     if (!allFormsClean()) {
                         unsavedWarningsConfig.log("a form is dirty");
-                        if (!confirm(unsavedWarningsConfig.navigateMessage)) {
-                            unsavedWarningsConfig.log("user wants to cancel leaving");
-                            event.preventDefault(); // user clicks cancel, wants to stay on page
-                        } else {
-                            unsavedWarningsConfig.log("user doesn't care about loosing stuff");
-                            $rootScope.$broadcast('resetResettables');
-                        }
+                        // allow any existing scope digest to complete
+                        setTimeout(function () {
+                            if (!confirm(unsavedWarningsConfig.navigateMessage)) {
+                                unsavedWarningsConfig.log("user wants to cancel leaving");
+                                event.preventDefault(); // user clicks cancel, wants to stay on page
+                            } else {
+                                unsavedWarningsConfig.log("user doesn't care about loosing stuff");
+                                $rootScope.$broadcast('resetResettables');
+                            }
+                        });
                     } else {
                         unsavedWarningsConfig.log("all forms are clean");
                     }
@@ -278,6 +281,7 @@ angular.module('unsavedChanges', ['resettable'])
                     // trigger resettables within this form or element 
                     var resettables = angular.element(formElement[0].querySelector('[resettable]'));
                     if(resettables.length) {
+                        // use safer method than $apply
                         $timeout(function () {
                             resettables.triggerHandler('resetResettables');
                         });
