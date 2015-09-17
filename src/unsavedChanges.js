@@ -237,8 +237,8 @@ angular.module('unsavedChanges', ['resettable'])
     }
 ])
 
-.directive('unsavedWarningForm', ['unsavedWarningSharedService', '$rootScope',
-    function(unsavedWarningSharedService, $rootScope) {
+.directive('unsavedWarningForm', ['unsavedWarningSharedService', '$rootScope', '$timeout',
+    function(unsavedWarningSharedService, $rootScope, $timeout) {
         return {
             scope: {},
             require: '^form',
@@ -278,7 +278,9 @@ angular.module('unsavedChanges', ['resettable'])
                     // trigger resettables within this form or element 
                     var resettables = angular.element(formElement[0].querySelector('[resettable]'));
                     if(resettables.length) {
-                        scope.$apply(resettables.triggerHandler('resetResettables'));    
+                        $timeout(function () {
+                            resettables.triggerHandler('resetResettables');
+                        });
                     }
 
                     // sets for back to valid and pristine states
