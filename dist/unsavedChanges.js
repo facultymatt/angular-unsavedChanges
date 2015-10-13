@@ -204,9 +204,11 @@ angular.module('unsavedChanges', ['resettable'])
                     if (!allFormsClean()) {
                         unsavedWarningsConfig.log("a form is dirty");
                         if (!confirm(unsavedWarningsConfig.navigateMessage)) {
+                            $rootScope.$broadcast('unsavedChanges:cancel');
                             unsavedWarningsConfig.log("user wants to cancel leaving");
                             event.preventDefault(); // user clicks cancel, wants to stay on page
                         } else {
+                            $rootScope.$broadcast('unsavedChanges:confirm');
                             unsavedWarningsConfig.log("user doesn't care about loosing stuff");
                             $rootScope.$broadcast('resetResettables');
                         }
@@ -274,11 +276,11 @@ angular.module('unsavedChanges', ['resettable'])
                 // do things like reset validation, present messages, etc.
                 formElement.bind('reset', function(event) {
                     event.preventDefault();
-                    
-                    // trigger resettables within this form or element 
+
+                    // trigger resettables within this form or element
                     var resettables = angular.element(formElement[0].querySelector('[resettable]'));
                     if(resettables.length) {
-                        scope.$apply(resettables.triggerHandler('resetResettables'));    
+                        scope.$apply(resettables.triggerHandler('resetResettables'));
                     }
 
                     // sets for back to valid and pristine states
@@ -308,7 +310,7 @@ angular.module('unsavedChanges', ['resettable'])
  * --------------------------------------------
  *
  * @note we don't create a seperate scope so the model value
- * is still available onChange within the controller scope. 
+ * is still available onChange within the controller scope.
  * This fixes https://github.com/facultymatt/angular-unsavedChanges/issues/19
  *
  */
