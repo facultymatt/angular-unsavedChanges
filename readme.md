@@ -20,7 +20,7 @@ In addition this module:
 
 ## How it Works
 
-The directive binds to `locationChangeStart` and `window.onbeforeunload`. When these events happen all registered froms are checked if they are dirty. The module defers to the forms `$dirty` property as a single source of truth. If dirty, the user is alerted. Disregarding changes resets the form and sets pristine.  
+The directive binds to `locationChangeStart` and `window.onbeforeunload`. When these events happen all registered forms are checked if they are dirty. The module defers to the forms `$dirty` property as a single source of truth. If dirty, the user is alerted. Disregarding changes resets the form and sets pristine.  
 
 ## Basic Usage
 
