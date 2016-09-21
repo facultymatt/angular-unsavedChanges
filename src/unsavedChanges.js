@@ -66,6 +66,8 @@ angular.module('unsavedChanges', ['resettable'])
             function translateIfAble(message) {
                 if ($injector.has('$translate') && useTranslateService) {
                     return $injector.get('$translate').instant(message);
+                } else if ($injector.has('gettextCatalog') && useTranslateService) {
+                    return $injector.get('gettextCatalog').getString(message);
                 } else {
                     return false;
                 }
