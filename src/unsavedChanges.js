@@ -195,25 +195,29 @@ angular.module('unsavedChanges', ['resettable'])
             $window.onbeforeunload = _this.confirmExit;
 
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
-
-            angular.forEach(eventsToWatchFor, function(aEvent) {
+angular.forEach(eventsToWatchFor, function (aEvent) {
                 //calling this function later will unbind this, acting as $off()
-                var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
+                var removeFn = $rootScope.$on(aEvent, function (event, next, current) {
                     unsavedWarningsConfig.log("user is moving with " + aEvent);
-                    // @todo this could be written a lot cleaner!
-                    if (!allFormsClean()) {
-                        unsavedWarningsConfig.log("a form is dirty");
-                        if (!confirm(unsavedWarningsConfig.navigateMessage)) {
-                            $rootScope.$broadcast('unsavedChanges:cancel');
-                            unsavedWarningsConfig.log("user wants to cancel leaving");
-                            event.preventDefault(); // user clicks cancel, wants to stay on page
+                    if (unsavedWarningsConfig.hasConfirmed) {
+                        unsavedWarningsConfig.log("user already confirmed, skipping confirmation for " + aEvent);
+                    }
+                    else {
+                        // @todo this could be written a lot cleaner!
+                        if (!allFormsClean()) {
+                            unsavedWarningsConfig.log("a form is dirty");
+                            if (!confirm(unsavedWarningsConfig.navigateMessage)) {
+                                $rootScope.$broadcast('unsavedChanges:cancel');
+                                unsavedWarningsConfig.log("user wants to cancel leaving");
+                                event.preventDefault(); // user clicks cancel, wants to stay on page
+                            } else {
+                                unsavedWarningsConfig.hasConfirmed = true;
+                                unsavedWarningsConfig.log("user doesn't care about loosing stuff...");
+                                $rootScope.$broadcast('resetResettables');
+                            }
                         } else {
-                            $rootScope.$broadcast('unsavedChanges:confirm');
-                            unsavedWarningsConfig.log("user doesn't care about loosing stuff");
-                            $rootScope.$broadcast('resetResettables');
+                            unsavedWarningsConfig.log("all forms are clean");
                         }
-                    } else {
-                        unsavedWarningsConfig.log("all forms are clean");
                     }
 
                 });
