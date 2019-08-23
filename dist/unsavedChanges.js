@@ -177,6 +177,7 @@ angular.module('unsavedChanges', ['resettable'])
             });
             removeFunctions = [];
             $window.onbeforeunload = null;
+            unsavedWarningsConfig.hasConfirmed = false;
         }
 
         // Function called when user tries to close the window

@@ -177,6 +177,7 @@ angular.module('unsavedChanges', ['resettable'])
             });
             removeFunctions = [];
             $window.onbeforeunload = null;
+            unsavedWarningsConfig.hasConfirmed = false;
         }
 
         // Function called when user tries to close the window
@@ -195,7 +196,7 @@ angular.module('unsavedChanges', ['resettable'])
             $window.onbeforeunload = _this.confirmExit;
 
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
-angular.forEach(eventsToWatchFor, function (aEvent) {
+            angular.forEach(eventsToWatchFor, function (aEvent) {
                 //calling this function later will unbind this, acting as $off()
                 var removeFn = $rootScope.$on(aEvent, function (event, next, current) {
                     unsavedWarningsConfig.log("user is moving with " + aEvent);
@@ -219,7 +220,6 @@ angular.forEach(eventsToWatchFor, function (aEvent) {
                             unsavedWarningsConfig.log("all forms are clean");
                         }
                     }
-
                 });
                 removeFunctions.push(removeFn);
             });
