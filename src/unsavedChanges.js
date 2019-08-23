@@ -177,6 +177,7 @@ angular.module('unsavedChanges', ['resettable'])
             });
             removeFunctions = [];
             $window.onbeforeunload = null;
+            unsavedWarningsConfig.hasConfirmed = false;
         }
 
         // Function called when user tries to close the window
@@ -195,25 +196,30 @@ angular.module('unsavedChanges', ['resettable'])
             $window.onbeforeunload = _this.confirmExit;
 
             var eventsToWatchFor = unsavedWarningsConfig.routeEvent;
-
-            angular.forEach(eventsToWatchFor, function(aEvent) {
+            angular.forEach(eventsToWatchFor, function (aEvent) {
                 //calling this function later will unbind this, acting as $off()
-                var removeFn = $rootScope.$on(aEvent, function(event, next, current) {
+                var removeFn = $rootScope.$on(aEvent, function (event, next, current) {
                     unsavedWarningsConfig.log("user is moving with " + aEvent);
-                    // @todo this could be written a lot cleaner!
-                    if (!allFormsClean()) {
-                        unsavedWarningsConfig.log("a form is dirty");
-                        if (!confirm(unsavedWarningsConfig.navigateMessage)) {
-                            unsavedWarningsConfig.log("user wants to cancel leaving");
-                            event.preventDefault(); // user clicks cancel, wants to stay on page
-                        } else {
-                            unsavedWarningsConfig.log("user doesn't care about loosing stuff");
-                            $rootScope.$broadcast('resetResettables');
-                        }
-                    } else {
-                        unsavedWarningsConfig.log("all forms are clean");
+                    if (unsavedWarningsConfig.hasConfirmed) {
+                        unsavedWarningsConfig.log("user already confirmed, skipping confirmation for " + aEvent);
                     }
-
+                    else {
+                        // @todo this could be written a lot cleaner!
+                        if (!allFormsClean()) {
+                            unsavedWarningsConfig.log("a form is dirty");
+                            if (!confirm(unsavedWarningsConfig.navigateMessage)) {
+                                $rootScope.$broadcast('unsavedChanges:cancel');
+                                unsavedWarningsConfig.log("user wants to cancel leaving");
+                                event.preventDefault(); // user clicks cancel, wants to stay on page
+                            } else {
+                                unsavedWarningsConfig.hasConfirmed = true;
+                                unsavedWarningsConfig.log("user doesn't care about loosing stuff...");
+                                $rootScope.$broadcast('resetResettables');
+                            }
+                        } else {
+                            unsavedWarningsConfig.log("all forms are clean");
+                        }
+                    }
                 });
                 removeFunctions.push(removeFn);
             });
@@ -274,11 +280,11 @@ angular.module('unsavedChanges', ['resettable'])
                 // do things like reset validation, present messages, etc.
                 formElement.bind('reset', function(event) {
                     event.preventDefault();
-                    
-                    // trigger resettables within this form or element 
+
+                    // trigger resettables within this form or element
                     var resettables = angular.element(formElement[0].querySelector('[resettable]'));
                     if(resettables.length) {
-                        scope.$apply(resettables.triggerHandler('resetResettables'));    
+                        scope.$apply(resettables.triggerHandler('resetResettables'));
                     }
 
                     // sets for back to valid and pristine states
@@ -308,7 +314,7 @@ angular.module('unsavedChanges', ['resettable'])
  * --------------------------------------------
  *
  * @note we don't create a seperate scope so the model value
- * is still available onChange within the controller scope. 
+ * is still available onChange within the controller scope.
  * This fixes https://github.com/facultymatt/angular-unsavedChanges/issues/19
  *
  */
